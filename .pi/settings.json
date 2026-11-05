@@ -1,0 +1,7 @@
+{
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
+  "skills": ["../.agents/skills"],
+  "subagents": {
+    "agentScanDirs": ["../.agents/agents"]
+  }
+}

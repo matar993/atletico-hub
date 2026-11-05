@@ -1,0 +1,48 @@
+[project]
+name = "atletico-hub-backend"
+version = "0.0.0"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.120",
+    "uvicorn[standard]>=0.38",
+]
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["uv_build>=0.8.13,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "atletico_hub"
+
+[tool.ruff]
+line-length = 120
+include = ["src/atletico_hub/**/*.py", "tests/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I", "B", "UP", "SIM"]
+
+[tool.ty.src]
+include = ["src/atletico_hub/**/*.py", "tests/**/*.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [".venv"]
+
+[tool.coverage.run]
+source = ["atletico_hub"]
+
+[tool.coverage.report]
+fail_under = 90
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28",
+    "pytest>=9",
+    "pytest-cov>=7",
+    "pytest-xdist>=3.8",
+    "ruff>=0.14",
+    "ty>=0.0.1a20",
+]

@@ -1,0 +1,41 @@
+schema: spec-driven
+
+context: |
+  Language: English
+  All artifacts must be written in English.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Before writing any artifact, read the AGENTS.md.
+
+rules:
+  proposal:
+    - >-
+      Only if this change takes a project-wide decision or contradicts an accepted ADR in
+      docs/documents/architecture/adr/, say so in the Impact section and name the ADR.
+  design:
+    - >-
+      Write an ADR only when this change takes a project-wide decision or contradicts an
+      accepted ADR in docs/documents/architecture/adr/. Every other decision stays in design.md.
+    - >-
+      In that case, draft the ADR with the architecture-decision-records skill, status
+      "proposed" (superseding the contradicted ADR, if any), and link it from design.md.
+      Never contradict an accepted ADR without one.
+
+operations:
+  apply:
+    guidance:
+      - >-
+        Commit often: one Conventional Commit per task or logical step, with the changes
+        in the body. The pull request is squashed, so small commits stay out of the trunk
+        history. Do not push unless the user asks. When all tasks are done, end with:
+        "The changes are committed. Please review and tell me what to fix, otherwise we can
+        archive with /openspec-archive-change."
+  archive:
+    guidance:
+      - >-
+        If proposal.md or design.md name ADRs, finalize them before moving the change: set new
+        ones to "accepted", mark replaced ones "superseded by ADR-NNNN", and update the ADR index.
+      - >-
+        After moving the change to the archive, stage the files explicitly and create a
+        Conventional Commit with the OpenSpec change id in the body, then open the pull
+        request with the gh skill.

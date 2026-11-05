@@ -1,0 +1,72 @@
+name: atletico-hub
+
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: ${DB_USER:-atletico}
+      POSTGRES_PASSWORD: ${DB_PASS:-atletico}
+      POSTGRES_DB: ${DB_DATABASE:-atletico}
+
+  api:
+    build:
+      context: ./backend
+      target: dev
+    image: atletico-hub-api:dev
+    # --reload-dir limits the watcher to the code that runs.
+    command: uvicorn atletico_hub.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src/atletico_hub
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8200:8000"
+    volumes:
+      - ./backend/src/atletico_hub:/app/src/atletico_hub
+      - ./backend/tests:/app/tests
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      WAIT_FOR_DB: "true"
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-atletico}
+      DB_PASS: ${DB_PASS:-atletico}
+      DB_DATABASE: ${DB_DATABASE:-atletico}
+    depends_on:
+      - db
+
+  # The web app's development server. Dependencies live in a volume and are installed again
+  # only when the hash of the lock file differs from the one of the last install.
+  ui:
+    image: node:22-alpine
+    restart: unless-stopped
+    working_dir: /app
+    command:
+      - sh
+      - -c
+      - |
+        hash=$$(sha256sum package-lock.json | cut -d' ' -f1)
+        if [ "$$(cat node_modules/.lock-hash 2>/dev/null)" != "$$hash" ]; then
+          npm ci --no-audit --no-fund && echo "$$hash" > node_modules/.lock-hash || exit 1
+        fi
+        exec npm run dev
+    ports:
+      - "127.0.0.1:3200:3200"
+    volumes:
+      - ./frontend:/app
+      - ui-node-modules:/app/node_modules
+    environment:
+      API_PROXY_TARGET: http://api:8000
+      # Read by `npm run gen:api`.
+      API_URL: http://api:8000
+      VITE_POLLING: ${VITE_POLLING:-}
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  ui-node-modules:
