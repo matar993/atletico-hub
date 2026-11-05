@@ -6,7 +6,7 @@
 
 ## Context
 
-Three people develop the app, mostly with coding agents. The repository needs a branching model that keeps integration continuous, makes releases explicit and keeps every pull request small enough to review. The team already knows this flow from other projects.
+The app is developed mostly with coding agents. The repository needs a branching model that keeps integration continuous, makes releases explicit and keeps every pull request small enough to review. The team already knows this flow from other projects.
 
 ## Decision
 
