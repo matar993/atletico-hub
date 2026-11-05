@@ -1,0 +1,201 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [develop, "release/**"]
+    tags: ["v*"]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # Decides which jobs run: a change to documents only runs none of them, and `ci-ok` still reports a result,
+  # so the required check of a pull request never waits for a job that was skipped.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      openspec: ${{ steps.filter.outputs.openspec }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - '.github/workflows/ci.yml'
+            frontend:
+              - 'frontend/**'
+              - '.github/workflows/ci.yml'
+            openspec:
+              - 'openspec/**'
+
+  openspec-validate:
+    needs: changes
+    if: needs.changes.outputs.openspec == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: npx --yes @fission-ai/openspec@1.14.3 validate --all --strict
+
+  backend-checks:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - run: uv sync --locked
+      - run: uv run ruff check src/atletico_hub tests
+      - run: uv run ruff format --check src/atletico_hub tests
+      - run: uv run ty check src/atletico_hub tests
+
+  backend-tests:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: atletico
+          POSTGRES_PASSWORD: atletico
+          POSTGRES_DB: atletico
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U atletico"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_USER: atletico
+      DB_PASS: atletico
+      DB_DATABASE: atletico
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - run: uv sync --locked
+      # The coverage floor is `fail_under` in pyproject.toml.
+      - run: uv run pytest tests -n 2 --cov --cov-report=term
+
+  ui-checks:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm test
+      - run: npm run build
+
+  ui-e2e:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+        env:
+          CI: "true"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          retention-days: 7
+
+  # A change to backend/ alone can break the web app's types: the committed schema.d.ts must match the API.
+  ui-api-types:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - working-directory: backend
+        run: |
+          uv sync --locked --no-dev
+          uv run --no-dev python -c 'import json, pathlib; from atletico_hub.main import app; pathlib.Path("../openapi.json").write_text(json.dumps(app.openapi()))'
+      - working-directory: frontend
+        run: |
+          npm ci --no-audit --no-fund
+          npx openapi-typescript ../openapi.json -o /tmp/schema.d.ts
+          diff -u src/lib/api/schema.d.ts /tmp/schema.d.ts || {
+            echo "frontend/src/lib/api/schema.d.ts differs from the API's OpenAPI document: run 'make ui-gen-api' and commit it."
+            exit 1
+          }
+
+  images:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - if: needs.changes.outputs.backend == 'true'
+        run: docker build --target runtime -t atletico-hub-api:ci backend
+      - if: needs.changes.outputs.frontend == 'true'
+        run: docker build -t atletico-hub-web:ci frontend
+
+  # The single required check of a pull request: fails when any job failed or was cancelled.
+  ci-ok:
+    if: always()
+    needs: [openspec-validate, backend-checks, backend-tests, ui-checks, ui-e2e, ui-api-types, images]
+    runs-on: ubuntu-latest
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
+      - run: echo "All jobs passed or were not needed."
