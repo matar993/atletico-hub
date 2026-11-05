@@ -110,7 +110,7 @@ Test layout and rules: [CODE_GUIDELINES.md](../../../../CODE_GUIDELINES.md#tests
 | `backend-checks` | `backend/` | ruff check, ruff format check, ty |
 | `backend-tests` | `backend/` | pytest with coverage, against a Postgres service |
 | `ui-checks` | `frontend/` | type check, lint, format check, unit tests, build |
-| `ui-e2e` | `frontend/` | Playwright on the production build |
+| `ui-e2e` | `frontend/` | Playwright on the production build, in the Playwright image of the locked version |
 | `ui-api-types` | `backend/` or `frontend/` | `schema.d.ts` matches the API's OpenAPI document |
 | `images` | `backend/` or `frontend/` | builds the API and web app images |
 | `ci-ok` | always | fails when any job failed or was cancelled |
