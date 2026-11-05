@@ -24,7 +24,7 @@ We follow a `develop` branch with release branches ([ADR-0001](docs/documents/ar
 
 ### Branch protection
 
-`develop` and `release/**` are protected on GitHub: changes arrive only through pull requests, the `ci-ok` check must pass, and one approval of another developer is required. Only squash merges are allowed.
+`develop` and `release/**` are protected on GitHub: changes arrive only through pull requests, the `ci-ok` check must pass, and no approval is required. Only squash merges are allowed.
 
 ### Stacked pull requests
 
@@ -90,6 +90,6 @@ The rules above hold at merge time. Do these steps in order. The agent merges on
 7. Check that the OpenSpec change is archived in this pull request (see [Agentic workflow](#agentic-workflow)).
 8. Review the final diff with the [`code-review`](.agents/skills/code-review/SKILL.md) skill.
 9. Write the squash commit message (see [Git workflow](#git-workflow)).
-10. Get the user's review of the pull request, the approval of another developer, and the authorization to merge.
+10. Get the user's review of the pull request and the authorization to merge.
 11. Check that the CI workflow ran on the latest commit. An `implementer` subagent monitors it (`gh pr checks <pr> --watch`) and reports when it ends.
 12. Merge with the command of the [`gh`](.agents/skills/gh/SKILL.md#ready-update-and-merge) skill.
