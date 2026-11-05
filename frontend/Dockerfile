@@ -1,6 +1,6 @@
 # The web app: a static build served by unprivileged nginx, which also forwards /api/ to the API.
 
-FROM node:22-alpine AS build
+FROM node:25-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
