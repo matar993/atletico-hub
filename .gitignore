@@ -1,0 +1,22 @@
+.DS_Store
+.env
+.env.*
+!example.env
+
+.venv/
+.ruff_cache/
+__pycache__/
+*.pyc
+*.egg-info/
+.coverage
+coverage.xml
+
+# IDEs
+.idea/
+.vscode/
+
+# Claude Code
+.claude/settings.local.json
+
+# tokensave code graph (local index)
+.tokensave/
