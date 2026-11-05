@@ -4,14 +4,14 @@ version = "0.0.0"
 requires-python = ">=3.14"
 dependencies = [
     "fastapi>=0.120",
-    "uvicorn[standard]>=0.38",
+    "uvicorn[standard]>=0.54.0",
 ]
 
 [tool.uv]
 package = true
 
 [build-system]
-requires = ["uv_build>=0.8.13,<0.14"]
+requires = ["uv_build>=0.13.6,<0.14"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
