@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# Runs the deterministic checks of the CI workflow on the areas a commit touches, so a forgotten
+# check fails here instead of on the pull request. Install it with `make hooks`.
+#
+#   openspec/  -> openspec validate --all --strict          (job openspec-validate)
+#   backend/   -> ruff lint with safe fixes, ruff format,    (job backend-checks)
+#                 type check; schema.d.ts up to date        (job ui-api-types)
+#                 (backend tests run before every push, not by this hook)
+#   frontend/  -> lint, format, unit tests, build            (job ui-checks; the build type checks)
+#                 and schema.d.ts up to date                 (job ui-api-types)
+#
+# Left to the workflow: the backend tests, browser tests (ui-e2e) and image builds. Backend tests are
+# also mandatory before every push. The checks run on the working tree, not on the staged content alone.
+# Skip the hook once with `git commit --no-verify`.
+
+set -uo pipefail
+
+echo "pre-commit started" >&2
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+staged=$(git diff --cached --name-only --diff-filter=ACMRD)
+[ -n "$staged" ] || exit 0
+
+touches() { grep -q "^$1" <<<"$staged"; }
+
+failed=()
+
+# The number of checks this commit runs, so each one shows how far the hook has come.
+total=0
+touches openspec/ && total=$((total + 1))
+touches backend/ && total=$((total + 3))
+touches frontend/ && total=$((total + 4))
+{ touches backend/ || touches frontend/; } && total=$((total + 1))
+[ "$total" -gt 0 ] || exit 0
+step=0
+
+run() {
+  local name=$1 start=$SECONDS
+  shift
+  step=$((step + 1))
+  echo
+  echo "pre-commit [$step/$total] $name ..."
+  if "$@"; then
+    echo "pre-commit [$step/$total] $name: passed in $((SECONDS - start))s"
+  else
+    echo "pre-commit [$step/$total] $name: FAILED after $((SECONDS - start))s"
+    failed+=("$name")
+  fi
+}
+
+# The ui and api containers serve the web app checks and the OpenAPI document.
+require_stack() {
+  local running
+  running=$(docker compose ps --status running --services 2>/dev/null)
+  for service in "$@"; do
+    if ! grep -qx "$service" <<<"$running"; then
+      echo "pre-commit: the '$service' container is not running. Start the stack with 'make up'."
+      exit 1
+    fi
+  done
+}
+
+# As ui-api-types: the OpenAPI document of the API without .env, so settings of this machine add
+# no route, turned into TypeScript, formatted and compared with the committed schema.d.ts.
+api_types() {
+  docker compose exec -T api env -i PATH=/opt/venv/bin:/usr/local/bin:/usr/bin:/bin \
+    python -c 'import json, pathlib; from atletico_hub.main import app; pathlib.Path("/tmp/openapi.json").write_text(json.dumps(app.openapi()))' \
+    >/dev/null 2>&1 || { echo "The API cannot build its OpenAPI document."; return 1; }
+  docker compose exec -T api cat /tmp/openapi.json | docker compose exec -T ui sh -c '
+    cat > /tmp/openapi.json &&
+    npx --no-install openapi-typescript /tmp/openapi.json -o /tmp/schema.d.ts >/dev/null 2>&1 &&
+    diff -u src/lib/api/schema.d.ts /tmp/schema.d.ts' || {
+    echo "frontend/src/lib/api/schema.d.ts differs from the API's OpenAPI document: run 'make ui-gen-api' and stage it."
+    return 1
+  }
+}
+
+# Re-stages the staged backend Python files that a fixing check rewrote, so the commit holds the fixed content.
+restage_python() {
+  local file
+  while IFS= read -r file; do
+    [ -f "$file" ] && git add -- "$file"
+  done < <(grep -E '^backend/(src/atletico_hub|tests)/.*\.py$' <<<"$staged")
+  return 0
+}
+
+backend_lint() {
+  (cd backend && uv run ruff check --fix src/atletico_hub tests) || return 1
+  restage_python
+}
+
+backend_format() {
+  (cd backend && uv run ruff format src/atletico_hub tests) || return 1
+  restage_python
+}
+
+backend_types() {
+  (cd backend && uv run ty check src/atletico_hub tests)
+}
+
+if touches openspec/; then
+  if command -v openspec >/dev/null; then
+    run "openspec validate" openspec validate --all --strict
+  else
+    step=$((step + 1))
+    echo "pre-commit [$step/$total] openspec validate: FAILED, openspec is not installed: npm install --global @fission-ai/openspec"
+    failed+=("openspec validate")
+  fi
+fi
+
+if touches backend/ || touches frontend/; then
+  require_stack api ui
+fi
+
+if touches backend/; then
+  run "backend lint" backend_lint
+  run "backend format" backend_format
+  run "backend types" backend_types
+fi
+
+if touches frontend/; then
+  run "ui lint" docker compose exec -T ui npm run lint
+  run "ui format" docker compose exec -T ui npm run format:check
+  run "ui unit tests" docker compose exec -T ui npm test
+  # `npm run build` is `tsc -b && vite build`: it covers the type check of `make ui-typecheck`.
+  run "ui build" docker compose exec -T ui npm run build
+fi
+
+if touches backend/ || touches frontend/; then
+  run "api types" api_types
+fi
+
+echo
+if [ ${#failed[@]} -gt 0 ]; then
+  echo "pre-commit: ${#failed[@]}/$total checks failed in ${SECONDS}s: ${failed[*]}. Fix them, or commit with --no-verify to skip the checks."
+  exit 1
+fi
+
+echo "pre-commit: $total/$total checks passed in ${SECONDS}s."
+if ! git diff --quiet; then
+  echo "pre-commit: the working tree has unstaged changes: the staged content alone was not checked."
+fi
