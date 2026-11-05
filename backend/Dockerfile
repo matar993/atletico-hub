@@ -1,5 +1,5 @@
 # Build context: backend/. Runs the Atletico Hub API.
-FROM ghcr.io/astral-sh/uv:0.13.5-trixie-slim AS base
+FROM ghcr.io/astral-sh/uv:0.13.7-trixie-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
