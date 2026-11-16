@@ -18,7 +18,7 @@
 
 - [x] 4.1 Add `tests/integration/conftest.py` with the per-worker test database and the per-test rolled-back session; verify with `tests/integration/db/test_session.py`, where a row committed inside a test is invisible to any other connection, under `make test` (4 workers)
 - [x] 4.2 Add the drift check in `tests/integration/db/test_migrations.py`; verify it passes, and fails when a throwaway model without a migration is added locally
-- [ ] 4.3 Verify `make test` passes with coverage at or above 90%
+- [x] 4.3 Verify `make test` passes with coverage at or above 90%
 
 ## 5. Documentation
 
