@@ -48,7 +48,7 @@ A session-scoped pytest fixture in `tests/integration/conftest.py` creates `<DB_
 - Alternative: one shared test database with table truncation. Rejected: unsafe under xdist.
 
 ### Drift check
-An integration test runs `alembic check` against the migrated test database and fails on any difference between `Base.metadata` and the schema, so a model change without a migration fails CI. `alembic check` goes through `env.py`, so it sees the same models as autogenerate.
+An integration test runs `alembic check` against the migrated test database and fails when autogenerate finds a difference between `Base.metadata` and the schema (tables, columns, types, nullability, server defaults, indexes and named constraints), so a model change without a migration fails CI. Autogenerate does not see renames, and sees only the models that `env.py` imports. `alembic check` goes through `env.py`, so it sees the same models as autogenerate.
 
 ## Risks / Trade-offs
 

@@ -14,7 +14,7 @@ if context.config.attributes.get("configure_logger", True) and context.config.co
 
 
 def run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=Base.metadata)
+    context.configure(connection=connection, target_metadata=Base.metadata, compare_server_default=True)
     with context.begin_transaction():
         context.run_migrations()
 
