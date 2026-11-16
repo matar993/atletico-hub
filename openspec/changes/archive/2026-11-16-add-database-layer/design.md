@@ -4,7 +4,7 @@
 
 See proposal.md for the motivation. Today the backend is `atletico_hub.main:app` with `GET /health` only. The stack already passes `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS` and `DB_DATABASE` to the `api` container and to the `backend-tests` CI job, and `docker-entrypoint.sh` waits for Postgres when `WAIT_FOR_DB=true`. The image copies only `src/`, so anything the API needs at runtime, migrations included, lives in the package. Tests run with `pytest -n 4` (xdist), so several workers hit Postgres at once.
 
-The project-wide choice of library is recorded in [ADR-0005](../../../docs/documents/architecture/adr/0005-database-access-through-sqlalchemy-and-alembic.md).
+The project-wide choice of library is recorded in [ADR-0005](../../../../docs/documents/architecture/adr/0005-database-access-through-sqlalchemy-and-alembic.md).
 
 ## Goals / Non-Goals
 

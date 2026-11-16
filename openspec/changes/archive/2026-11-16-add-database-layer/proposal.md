@@ -34,4 +34,4 @@ None.
 - **Image and stack**: `docker-entrypoint.sh` runs `alembic upgrade head` before the command when asked to; `compose.yaml` turns it on for the `api` service.
 - **Tests and CI**: integration tests reach Postgres through the `DB_*` variables, which `backend-tests` already sets. No workflow change expected.
 - **Docs**: developer guide (migrations), `ARCHITECTURE.md` (database access), `CODE_GUIDELINES.md` (repository pattern on SQLAlchemy).
-- **ADR**: takes a project-wide decision on database access and migrations, recorded as [ADR-0005](../../../docs/documents/architecture/adr/0005-database-access-through-sqlalchemy-and-alembic.md) (proposed). It extends ADR-0002 and does not contradict it.
+- **ADR**: takes a project-wide decision on database access and migrations, recorded as [ADR-0005](../../../../docs/documents/architecture/adr/0005-database-access-through-sqlalchemy-and-alembic.md) (accepted). It extends ADR-0002 and does not contradict it.
