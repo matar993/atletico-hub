@@ -21,3 +21,4 @@ class TestGetSessionFactory:
         assert url.drivername == "postgresql+psycopg"
         assert url.host == "db"
         assert url.database == "atletico"
+        assert factory.kw["bind"].pool._pre_ping is True

@@ -17,7 +17,7 @@ The project-wide choice of library is recorded in [ADR-0005](../../../../docs/do
 - No tables. The first table arrives with `add-auth-and-roles`.
 - No database check in `GET /health`. It keeps its current contract.
 - No async database access.
-- No connection-pool tuning beyond SQLAlchemy defaults.
+- No connection-pool tuning beyond SQLAlchemy defaults, except `pool_pre_ping`, so a Postgres restart does not fail the next request on each pooled connection.
 
 ## Decisions
 
