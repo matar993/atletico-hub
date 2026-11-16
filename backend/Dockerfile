@@ -20,6 +20,7 @@ COPY .python-version pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project --no-dev \
     && chmod -R a+rX "$UV_PYTHON_INSTALL_DIR" /opt/venv
 
+COPY alembic.ini ./
 COPY src src
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 

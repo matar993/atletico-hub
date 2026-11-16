@@ -11,7 +11,7 @@
 
 ## 3. Migrations
 
-- [ ] 3.1 Add `backend/alembic.ini` and `atletico_hub/db/migrations/` (`env.py` reading `DatabaseSettings` and `Base.metadata`, empty `versions/`); verify `docker compose run --rm api alembic upgrade head` creates `alembic_version`
+- [x] 3.1 Add `backend/alembic.ini` and `atletico_hub/db/migrations/` (`env.py` reading `DatabaseSettings` and `Base.metadata`, empty `versions/`); verify `docker compose run --rm api alembic upgrade head` creates `alembic_version`
 - [ ] 3.2 Run `alembic upgrade head` in `docker-entrypoint.sh` when `MIGRATE_DB=true`, and set it for `api` in `compose.yaml`; verify `make up` starts the API and `docker compose logs api` shows the upgrade
 
 ## 4. Integration test setup
