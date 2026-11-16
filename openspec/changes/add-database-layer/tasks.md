@@ -2,7 +2,7 @@
 
 ## 1. Dependencies and settings
 
-- [ ] 1.1 Add `sqlalchemy`, `psycopg[binary]`, `alembic` and `pydantic-settings` to `backend/pyproject.toml`, run `make lock` and `docker compose build api`; verify `docker compose run --rm api python -c "import sqlalchemy, psycopg, alembic"` succeeds
+- [x] 1.1 Add `sqlalchemy`, `psycopg[binary]`, `alembic` and `pydantic-settings` to `backend/pyproject.toml`, run `make lock` and `docker compose build api`; verify `docker compose run --rm api python -c "import sqlalchemy, psycopg, alembic"` succeeds
 - [ ] 1.2 Add `DatabaseSettings` reading the `DB_*` variables and building the psycopg URL; verify with unit tests in `tests/unit/db/` for the URL and for a missing variable
 
 ## 2. Engine and session
