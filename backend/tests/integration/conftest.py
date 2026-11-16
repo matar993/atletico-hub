@@ -23,7 +23,6 @@ def db_engine() -> Iterator[Engine]:
     name = f"{url.database}_test_{run}_{os.environ.get('PYTEST_XDIST_WORKER', 'main')}"
     admin = create_engine(url, isolation_level="AUTOCOMMIT")
     with admin.connect() as connection:
-        connection.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
         connection.execute(text(f'CREATE DATABASE "{name}"'))
     engine = create_engine(url.set(database=name))
     config = Config(ALEMBIC_INI)

@@ -43,7 +43,7 @@ A `DatabaseSettings` model reads the existing `DB_*` variables and builds the UR
 - Alternative: a manual `make migrate` step. Rejected: easy to forget after pulling `develop`.
 
 ### Integration test database
-A session-scoped pytest fixture in `tests/integration/conftest.py` creates `<DB_DATABASE>_test_<worker id>`, runs `alembic upgrade head` on it once, and drops it at the end. A per-test fixture opens a connection, begins a transaction, binds a session to it with `join_transaction_mode="create_savepoint"`, and rolls back after the test. Tests never see each other's rows, and the workers never share a database.
+A session-scoped pytest fixture in `tests/integration/conftest.py` creates `<DB_DATABASE>_test_<run id>_<worker id>`, runs `alembic upgrade head` on it once, and drops it at the end. A per-test fixture opens a connection, begins a transaction, binds a session to it with `join_transaction_mode="create_savepoint"`, and rolls back after the test. Tests never see each other's rows, and neither the workers nor two runs on the shared stack share a database.
 - This is test infrastructure, not test data: CODE_GUIDELINES' "no shared setup helpers" still applies to rows, which each test builds inline.
 - Alternative: one shared test database with table truncation. Rejected: unsafe under xdist.
 
@@ -55,7 +55,7 @@ An integration test runs `alembic check` against the migrated test database and 
 - [Python 3.14 and new SQLAlchemy/psycopg wheels] → uv lock pins them; `make test` and the image build run in CI.
 - [A bad migration blocks API start] → intended: the container fails fast; `alembic downgrade -1` rolls back locally.
 - [Forgetting to import a new models module in `env.py`] → autogenerate misses its table. The drift check catches it only when the test run imports the module elsewhere, which the feature's own tests do. The setup guide names the import as a step.
-- [Per-worker databases leak if a run is killed] → the fixture drops a leftover database of the same name before creating it.
+- [Test databases leak if a run is killed, since names never repeat] → the setup guide gives a command that drops every `<DB_DATABASE>_test_*` database.
 
 ## Migration Plan
 
