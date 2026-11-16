@@ -31,15 +31,17 @@ flowchart LR
 |---|---|---|
 | Web app | `frontend/` | Pages for players and staff; calls the API through the generated client `frontend/src/lib/api/` ([ADR-0003](docs/documents/architecture/adr/0003-web-app-is-a-react-spa-on-vite.md)) |
 | API | `backend/src/atletico_hub/` | HTTP routes, business rules, access to the database ([ADR-0002](docs/documents/architecture/adr/0002-backend-on-python-fastapi-and-postgres.md)) |
-| Database | Postgres | The team's data |
+| Database access | `backend/src/atletico_hub/db/` | Settings, engine, per-request session (`get_session`), declarative `Base`, Alembic migrations ([ADR-0005](docs/documents/architecture/adr/0005-database-access-through-sqlalchemy-and-alembic.md)) |
+| Database | Postgres | The team's data; its schema changes only through migrations |
 
 ## Boundaries
 
 - The web app reaches the API only through `/api` on its own origin, and only through the generated client.
 - The API is the only component that reads or writes the database.
+- Inside the API, features reach the database through their repositories, which wrap the session of `get_session`. Routes never run queries.
 - Business rules live in the API. The web app checks input for usability only; the API checks it again.
 - Code is grouped by feature, not by kind ([CODE_GUIDELINES.md](CODE_GUIDELINES.md#code-patterns)).
 
 ## Today
 
-The app holds only the skeleton: the API answers `GET /health` and the web app shows the home page. Each feature arrives as an OpenSpec change, which updates this document when it changes the components or their boundaries.
+The app holds only the skeleton: the API answers `GET /health` and the web app shows the home page. The database layer is in place, with no table yet. Each feature arrives as an OpenSpec change, which updates this document when it changes the components or their boundaries.

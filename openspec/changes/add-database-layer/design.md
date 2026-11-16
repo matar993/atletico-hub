@@ -53,7 +53,7 @@ An integration test compares `Base.metadata` with the migrated schema through Al
 
 - [Python 3.14 and new SQLAlchemy/psycopg wheels] → uv lock pins them; `make test` and the image build run in CI.
 - [A bad migration blocks API start] → intended: the container fails fast; `alembic downgrade -1` rolls back locally.
-- [Forgetting to import a new models module in `env.py`] → the drift check fails, because the migration would create a table the metadata does not know.
+- [Forgetting to import a new models module in `env.py`] → autogenerate misses its table. The drift check catches it only when the test run imports the module elsewhere, which the feature's own tests do. The setup guide names the import as a step.
 - [Per-worker databases leak if a run is killed] → the fixture drops a leftover database of the same name before creating it.
 
 ## Migration Plan

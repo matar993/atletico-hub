@@ -22,7 +22,7 @@
 
 ## 5. Documentation
 
-- [ ] 5.1 Document migrations (create with `alembic revision --autogenerate`, apply, roll back, reset) in the developer guide, `MIGRATE_DB` in the stack notes, the database access in `ARCHITECTURE.md`, and the repository-on-SQLAlchemy pattern in `CODE_GUIDELINES.md`; verify each documented command runs as written
+- [x] 5.1 Document migrations (create with `alembic revision --autogenerate`, apply, roll back, reset) in the developer guide, `MIGRATE_DB` in the stack notes, the database access in `ARCHITECTURE.md`, and the repository-on-SQLAlchemy pattern in `CODE_GUIDELINES.md`; verify each documented command runs as written
 
 ## Workflow follow-up
 

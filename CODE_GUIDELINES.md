@@ -29,7 +29,9 @@ Backend (`backend/src/atletico_hub/`):
 
 - Use Pydantic models and type hints. See the [`pydantic`](.agents/skills/pydantic/SKILL.md) skill for models with constraints or hierarchies.
 - Build the API with FastAPI as the [`fastapi`](.agents/skills/fastapi/SKILL.md) skill describes: dependencies, response models, streaming responses.
-- Reach the database through a repository, so storage can be mocked in unit tests (principle 7, depend on abstractions).
+- Reach the database through a repository, so storage can be mocked in unit tests (principle 7, depend on abstractions). A repository wraps the SQLAlchemy `Session` that routes get from `get_session` (`atletico_hub/db/session.py`).
+- Declare tables as SQLAlchemy models that extend `atletico_hub.db.base.Base`, in the `models.py` of their feature (`atletico_hub/<feature>/models.py`). Each model change ships with its Alembic migration ([setup guide](docs/documents/developer-guide/setup/README.md#database-migrations)).
+- Write routes that use the database as plain `def` functions: database access is synchronous ([ADR-0005](docs/documents/architecture/adr/0005-database-access-through-sqlalchemy-and-alembic.md)).
 - Use immutability for classes. No setter methods (illegal states unrepresentable).
 - Return `Optional[Something]` when the result may be None (illegal states unrepresentable).
 - Write no docstrings unless required: express intent through names (principle 5, KISS).
@@ -71,7 +73,7 @@ Write many unit tests, some integration tests and few end-to-end tests. The lowe
 
 - The three folders each mirror `atletico_hub/` and each contains an `__init__.py`:
   - `tests/unit/`: no database, network or app. Pure logic.
-  - `tests/integration/`: a real Postgres, but not the whole app.
+  - `tests/integration/`: a real Postgres, but not the whole app. Use the `db_session` fixture: each test's changes are rolled back.
   - `tests/system/`: the whole app, through FastAPI's `TestClient`.
 - A test needing more than one level goes in the highest one. A test file never mixes levels: split it.
 - One test file per class or module under test, named `test_<module>.py`.
