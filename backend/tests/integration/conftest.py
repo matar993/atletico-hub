@@ -1,4 +1,5 @@
 import os
+import uuid
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -13,11 +14,13 @@ from atletico_hub.db.settings import DatabaseSettings
 ALEMBIC_INI = Path(__file__).parents[2] / "alembic.ini"
 
 
-# One database per xdist worker, migrated once, so parallel workers never share rows or schema.
+# One database per test run and xdist worker, migrated once: parallel workers, and runs from other worktrees
+# on the shared stack, never share rows or schema.
 @pytest.fixture(scope="session")
 def db_engine() -> Iterator[Engine]:
     url = DatabaseSettings().url
-    name = f"{url.database}_test_{os.environ.get('PYTEST_XDIST_WORKER', 'main')}"
+    run = os.environ.get("PYTEST_XDIST_TESTRUNUID", uuid.uuid4().hex)[:8]
+    name = f"{url.database}_test_{run}_{os.environ.get('PYTEST_XDIST_WORKER', 'main')}"
     admin = create_engine(url, isolation_level="AUTOCOMMIT")
     with admin.connect() as connection:
         connection.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
@@ -26,6 +29,7 @@ def db_engine() -> Iterator[Engine]:
     config = Config(ALEMBIC_INI)
     with engine.begin() as connection:
         config.attributes["connection"] = connection
+        config.attributes["configure_logger"] = False
         command.upgrade(config, "head")
     yield engine
     engine.dispose()

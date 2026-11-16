@@ -30,3 +30,15 @@ class TestDatabaseSettings:
 
         with pytest.raises(ValidationError, match="DB_PASS"):
             DatabaseSettings()
+
+    def test_repr_hides_the_password(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("DB_HOST", "db")
+        monkeypatch.setenv("DB_PORT", "5432")
+        monkeypatch.setenv("DB_USER", "atletico")
+        monkeypatch.setenv("DB_PASS", "very-secret")
+        monkeypatch.setenv("DB_DATABASE", "atletico")
+
+        settings = DatabaseSettings()
+
+        assert "very-secret" not in repr(settings)
+        assert "very-secret" not in repr(settings.url)

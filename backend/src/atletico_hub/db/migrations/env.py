@@ -8,7 +8,8 @@ from atletico_hub.db.settings import DatabaseSettings
 
 # Import every feature's models module here, so autogenerate and the drift test see its tables.
 
-if context.config.config_file_name is not None:
+# The tests set configure_logger to False: fileConfig would replace pytest's log capture.
+if context.config.attributes.get("configure_logger", True) and context.config.config_file_name is not None:
     fileConfig(context.config.config_file_name, disable_existing_loggers=False)
 
 

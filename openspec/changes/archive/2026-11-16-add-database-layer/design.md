@@ -38,7 +38,8 @@ A `DatabaseSettings` model reads the existing `DB_*` variables and builds the UR
 
 ### Migrations run before the API starts
 `docker-entrypoint.sh` runs `alembic upgrade head` when `MIGRATE_DB=true`, after the existing wait for Postgres. `compose.yaml` sets it for `api`. The production image gets the same switch.
-- Alternative: run migrations in the FastAPI startup hook. Rejected: with several API replicas they would race, and a failing migration should stop the container before it serves traffic.
+- Alternative: run migrations in the FastAPI startup hook. Rejected: a failing migration should stop the container before it serves traffic.
+- Several API replicas that start together would each run the migrations, in the entrypoint as in a startup hook: one fails on the concurrent DDL and restarts. One replica runs today. More replicas need a `pg_advisory_lock` in `env.py` or a one-off migration job.
 - Alternative: a manual `make migrate` step. Rejected: easy to forget after pulling `develop`.
 
 ### Integration test database
