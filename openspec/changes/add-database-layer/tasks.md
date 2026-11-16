@@ -7,7 +7,7 @@
 
 ## 2. Engine and session
 
-- [ ] 2.1 Add `atletico_hub/db/base.py`, `engine.py` and `session.py` (`get_session` dependency, one session per request, always closed); verify with a unit test that the session is closed after the dependency ends, also when the route raises
+- [x] 2.1 Add `atletico_hub/db/base.py`, `engine.py` and `session.py` (`get_session` dependency, one session per request, always closed); verify with a unit test that the session is closed after the dependency ends, also when the route raises
 
 ## 3. Migrations
 
