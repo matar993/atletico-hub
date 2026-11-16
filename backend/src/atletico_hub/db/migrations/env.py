@@ -1,7 +1,7 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import create_engine
+from sqlalchemy import Connection, create_engine
 
 from atletico_hub.db.base import Base
 from atletico_hub.db.settings import DatabaseSettings
@@ -11,7 +11,17 @@ from atletico_hub.db.settings import DatabaseSettings
 if context.config.config_file_name is not None:
     fileConfig(context.config.config_file_name, disable_existing_loggers=False)
 
-with create_engine(DatabaseSettings().url).connect() as connection:
+
+def run_migrations(connection: Connection) -> None:
     context.configure(connection=connection, target_metadata=Base.metadata)
     with context.begin_transaction():
         context.run_migrations()
+
+
+# The integration tests pass the connection of their own database; otherwise connect with the DB_* settings.
+test_connection = context.config.attributes.get("connection")
+if test_connection is None:
+    with create_engine(DatabaseSettings().url).connect() as connection:
+        run_migrations(connection)
+else:
+    run_migrations(test_connection)
