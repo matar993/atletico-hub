@@ -11,7 +11,8 @@ lock:
 # Runs the backend tests (pytest) in a one-off `api` container, with the database from the stack.
 TEST_WORKERS ?= 4
 test:
-	docker compose run --rm api pytest tests -n $(TEST_WORKERS) --cov --cov-report=term
+# MIGRATE_DB=false: the tests migrate their own databases, never the dev one.
+	docker compose run --rm -e MIGRATE_DB=false api pytest tests -n $(TEST_WORKERS) --cov --cov-report=term
 
 # Lints the backend with ruff from the uv environment of `backend/`. Fails on any finding.
 lint:

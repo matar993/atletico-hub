@@ -8,4 +8,4 @@ Decisions that span the whole project, one file per decision. Decisions that bel
 | [0002](0002-backend-on-python-fastapi-and-postgres.md) | The backend is a Python FastAPI app on Postgres | accepted | 2026-11-05 |
 | [0003](0003-web-app-is-a-react-spa-on-vite.md) | The web app is a React single-page app on Vite, with a generated API client | accepted | 2026-11-05 |
 | [0004](0004-web-app-ships-as-its-own-image-and-reaches-the-api-under-api.md) | The web app ships as its own image and reaches the API on its own origin, under `/api` | accepted | 2026-11-05 |
-| [0005](0005-database-access-through-sqlalchemy-and-alembic.md) | The API reaches Postgres through synchronous SQLAlchemy 2, with Alembic migrations | proposed | 2026-11-16 |
+| [0005](0005-database-access-through-sqlalchemy-and-alembic.md) | The API reaches Postgres through synchronous SQLAlchemy 2, with Alembic migrations | accepted | 2026-11-16 |

@@ -1,7 +1,7 @@
 # ADR-0005: The API reaches Postgres through synchronous SQLAlchemy 2, with Alembic migrations
 
 **Date**: 2026-11-16
-**Status**: proposed
+**Status**: accepted
 **Deciders**: Peter Wright
 
 ## Context
