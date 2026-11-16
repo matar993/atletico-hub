@@ -29,7 +29,7 @@ None.
 
 ## Impact
 
-- **Code**: new `backend/src/atletico_hub/db/` (engine, session, base model, migrations); `main.py` unchanged apart from wiring.
+- **Code**: new `backend/src/atletico_hub/db/` (settings, engine, session, base model, migrations); `main.py` unchanged.
 - **Dependencies**: `sqlalchemy`, `psycopg[binary]`, `alembic`, `pydantic-settings`.
 - **Image and stack**: `docker-entrypoint.sh` runs `alembic upgrade head` before the command when asked to; `compose.yaml` turns it on for the `api` service.
 - **Tests and CI**: integration tests reach Postgres through the `DB_*` variables, which `backend-tests` already sets. No workflow change expected.

@@ -14,4 +14,4 @@ class TestMigrations:
 
         with db_engine.connect() as connection:
             config.attributes["connection"] = connection
-            command.check(config)
+            command.check(config=config)

@@ -11,7 +11,3 @@ class TestDbSession:
         assert db_session.execute(text("SELECT id FROM probe")).scalar_one() == 1
         with db_engine.connect() as other:
             assert other.execute(text("SELECT to_regclass('probe')")).scalar_one() is None
-
-    def test_db_engine_has_the_migrations_applied(self, db_engine: Engine) -> None:
-        with db_engine.connect() as connection:
-            assert connection.execute(text("SELECT to_regclass('alembic_version')")).scalar_one() == "alembic_version"

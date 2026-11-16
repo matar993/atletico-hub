@@ -30,11 +30,11 @@ A `DatabaseSettings` model reads the existing `DB_*` variables and builds the UR
 - Alternative: one `DATABASE_URL` variable. Rejected: it would change compose, CI and `example.env` for no gain.
 
 ### Module layout: `atletico_hub/db/`
-`engine.py` (engine and session factory from settings), `session.py` (the `get_session` dependency, one session per request, closed after it), `base.py` (the declarative `Base` that every feature's models extend), `migrations/` (Alembic `env.py` and `versions/`). Feature models live with their feature, for example `atletico_hub/auth/models.py`, per CODE_GUIDELINES "group by meaning". Repositories wrap the session per feature, so unit tests mock the repository, not SQLAlchemy.
+`settings.py` (`DatabaseSettings`), `engine.py` (engine and session factory from settings, built on first use), `session.py` (the `get_session` dependency, one session per request, closed after it), `base.py` (the declarative `Base` that every feature's models extend), `migrations/` (Alembic `env.py` and `versions/`). Feature models live with their feature, for example `atletico_hub/auth/models.py`, per CODE_GUIDELINES "group by meaning". Repositories wrap the session per feature, so unit tests mock the repository, not SQLAlchemy.
 - Alternative: one `models.py` for all tables. Rejected: CODE_GUIDELINES forbids modules that collect one kind of object.
 
 ### Alembic configured in code, inside the package
-`alembic.ini` sits in `backend/` for the CLI and points `script_location` at `atletico_hub.db:migrations`; `env.py` takes the URL from `DatabaseSettings`, never from the ini file. Autogenerate reads `Base.metadata`, so `env.py` imports every feature's models module.
+`alembic.ini` sits in `backend/` for the CLI and points `script_location` at `atletico_hub.db:migrations`; `env.py` takes the URL from `DatabaseSettings`, never from the ini file, or the connection the integration tests pass. A post-write hook runs ruff on each new revision. Autogenerate reads `Base.metadata`, so `env.py` imports every feature's models module.
 
 ### Migrations run before the API starts
 `docker-entrypoint.sh` runs `alembic upgrade head` when `MIGRATE_DB=true`, after the existing wait for Postgres. `compose.yaml` sets it for `api`. The production image gets the same switch.
@@ -47,7 +47,7 @@ A session-scoped pytest fixture in `tests/integration/conftest.py` creates `<DB_
 - Alternative: one shared test database with table truncation. Rejected: unsafe under xdist.
 
 ### Drift check
-An integration test compares `Base.metadata` with the migrated schema through Alembic's `compare_metadata` and fails on any difference, so a model change without a migration fails CI.
+An integration test runs `alembic check` against the migrated test database and fails on any difference between `Base.metadata` and the schema, so a model change without a migration fails CI. `alembic check` goes through `env.py`, so it sees the same models as autogenerate.
 
 ## Risks / Trade-offs
 

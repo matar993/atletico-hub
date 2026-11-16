@@ -35,7 +35,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and [CODE_GUIDELINES.md
 
 | Folder | Contents |
 |---|---|
-| `backend/` | The API: the Python package `atletico_hub` (`src/atletico_hub/`), its tests (`tests/`) and its image (`Dockerfile`, `pyproject.toml`, `uv.lock`) ([ADR-0002](docs/documents/architecture/adr/0002-backend-on-python-fastapi-and-postgres.md)) |
+| `backend/` | The API: the Python package `atletico_hub` (`src/atletico_hub/`), its tests (`tests/`) and its image (`Dockerfile`, `pyproject.toml`, `uv.lock`, `alembic.ini`) ([ADR-0002](docs/documents/architecture/adr/0002-backend-on-python-fastapi-and-postgres.md)) |
 | `frontend/` | The web app: React and Vite, its unit and browser tests, and its image (`Dockerfile`, `nginx/`) ([ADR-0003](docs/documents/architecture/adr/0003-web-app-is-a-react-spa-on-vite.md)) |
 | `docs/` | `documents/` (`architecture/` with ADRs, `developer-guide/`, `user-guide/`) and `facts/` (verified facts) |
 | `openspec/` | [OpenSpec](https://github.com/Fission-AI/OpenSpec): specs of the current behavior (`specs/`) and in-progress and completed changes (`changes/`) |
