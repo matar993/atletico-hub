@@ -1,5 +1,6 @@
 #!/bin/bash -e
 # With WAIT_FOR_DB=true, waits until Postgres accepts TCP connections before starting the command.
+# With MIGRATE_DB=true, then applies the database migrations (alembic upgrade head); a failure stops the container.
 if [[ "${WAIT_FOR_DB:-}" =~ ^([Tt]rue|1)$ ]]; then
   timeout="${DB_WAIT_TIMEOUT:-60}"
   deadline=$((SECONDS + timeout))
@@ -10,5 +11,8 @@ if [[ "${WAIT_FOR_DB:-}" =~ ^([Tt]rue|1)$ ]]; then
     fi
     sleep 1
   done
+fi
+if [[ "${MIGRATE_DB:-}" =~ ^([Tt]rue|1)$ ]]; then
+  alembic upgrade head
 fi
 exec "$@"

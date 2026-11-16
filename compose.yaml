@@ -31,6 +31,7 @@ services:
         required: false
     environment:
       WAIT_FOR_DB: "true"
+      MIGRATE_DB: "true"
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: ${DB_USER:-atletico}
