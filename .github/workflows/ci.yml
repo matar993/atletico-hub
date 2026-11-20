@@ -65,6 +65,7 @@ jobs:
       - run: uv run ruff check src/atletico_hub tests
       - run: uv run ruff format --check src/atletico_hub tests
       - run: uv run ty check src/atletico_hub tests
+      - run: uv run lint-imports
 
   backend-tests:
     needs: changes

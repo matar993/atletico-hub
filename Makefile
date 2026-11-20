@@ -1,4 +1,4 @@
-.PHONY: lock test lint typecheck lint-fix autoformat \
+.PHONY: lock test lint typecheck lint-imports lint-fix autoformat \
 	ui-typecheck ui-lint ui-format ui-format-check ui-test ui-build ui-checks ui-e2e ui-gen-api \
 	validate hooks up down logs ps
 
@@ -21,6 +21,10 @@ lint:
 # Type checks the backend with ty from the uv environment of `backend/`. Fails on any diagnostic.
 typecheck:
 	cd backend && uv run ty check src/atletico_hub tests
+
+# Checks the layer contracts of ADR-0006 with import-linter. Fails on any broken contract.
+lint-imports:
+	cd backend && uv run lint-imports
 
 # Lints and applies the safe fixes. Run `make autoformat` after it.
 lint-fix:

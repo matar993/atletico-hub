@@ -4,6 +4,7 @@
 #
 #   openspec/  -> openspec validate --all --strict          (job openspec-validate)
 #   backend/   -> ruff lint with safe fixes, ruff format,    (job backend-checks)
+#                 ty, import-linter layer contracts
 #                 type check; schema.d.ts up to date        (job ui-api-types)
 #                 (backend tests run before every push, not by this hook)
 #   frontend/  -> lint, format, unit tests, build            (job ui-checks; the build type checks)
@@ -29,7 +30,7 @@ failed=()
 # The number of checks this commit runs, so each one shows how far the hook has come.
 total=0
 touches openspec/ && total=$((total + 1))
-touches backend/ && total=$((total + 3))
+touches backend/ && total=$((total + 4))
 touches frontend/ && total=$((total + 4))
 { touches backend/ || touches frontend/; } && total=$((total + 1))
 [ "$total" -gt 0 ] || exit 0
@@ -99,6 +100,10 @@ backend_types() {
   (cd backend && uv run ty check src/atletico_hub tests)
 }
 
+backend_imports() {
+  (cd backend && uv run lint-imports)
+}
+
 if touches openspec/; then
   if command -v openspec >/dev/null; then
     run "openspec validate" openspec validate --all --strict
@@ -117,6 +122,7 @@ if touches backend/; then
   run "backend lint" backend_lint
   run "backend format" backend_format
   run "backend types" backend_types
+  run "backend layers" backend_imports
 fi
 
 if touches frontend/; then

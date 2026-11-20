@@ -38,7 +38,8 @@ flowchart LR
 
 - The web app reaches the API only through `/api` on its own origin, and only through the generated client.
 - The API is the only component that reads or writes the database.
-- Inside the API, features reach the database through their repositories, which wrap the session of `get_session`. Routes never run queries.
+- Inside the API, each feature is a package of layers: router, service, schemas, repository, models ([ADR-0006](docs/documents/architecture/adr/0006-layered-feature-packages-in-the-api.md)). A layer imports only the layers below it, and only the router knows HTTP. `import-linter` checks both rules in CI.
+- Features reach the database through their repositories, which wrap the session of `get_session`. Routes never run queries. The service holds the business rules and commits the transaction.
 - Business rules live in the API. The web app checks input for usability only; the API checks it again.
 - Code is grouped by feature, not by kind ([CODE_GUIDELINES.md](CODE_GUIDELINES.md#code-patterns)).
 
