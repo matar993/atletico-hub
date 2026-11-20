@@ -54,7 +54,7 @@
 
 ## 9. Documentation
 
-- [ ] 9.1 Add user guide pages for the Utenti panel and the Profilo page, list them in the user guide index, update the invite page for admin accounts, and update the "Today" section of `ARCHITECTURE.md`; verify links resolve and `make validate` passes
+- [x] 9.1 Add user guide pages for the Utenti panel and the Profilo page, list them in the user guide index, update the invite page for admin accounts, and update the "Today" section of `ARCHITECTURE.md`; verify links resolve and `make validate` passes
 
 ## 10. Integration check
 

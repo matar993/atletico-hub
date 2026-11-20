@@ -36,6 +36,14 @@ Admins work on the Rosa page (`/squad`). A user with the role `player` does not 
 
 The player appears in the list as "Senza account".
 
+### Rename a player
+
+1. Press "Modifica nome" on the row of the player.
+2. Change first name and last name, 1 to 50 characters each.
+3. Press "Salva".
+
+The list shows the new name at once. A player changes their own name on the [Profilo page](profile.md).
+
 ### Create a link
 
 1. Press "Crea link d'invito" on the row of the player.
@@ -49,3 +57,5 @@ The list shows the email of each player that has an account. Players see the lis
 ### Reset a password
 
 Create a new link for the player and send it. The player opens it and chooses a new password.
+
+The row of a player whose account has the role `admin` has no "Crea link d'invito" button, and the API refuses to create one. An admin's password is reset only from the command line of the API host: see [commands on the API host](../developer-guide/setup/README.md#commands-on-the-api-host). Promoting a player to admin cancels the open links of that player.
