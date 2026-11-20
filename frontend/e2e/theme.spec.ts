@@ -59,3 +59,18 @@ test('chooses a theme with the keyboard only', async ({ page }) => {
   await expect(trigger).toBeFocused()
   expect(await isDark(page)).toBe(true)
 })
+
+test('loads fonts, theme script and styles without a Content-Security-Policy violation', async ({ page }) => {
+  const problems: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'error' || message.type() === 'warning') problems.push(message.text())
+  })
+  page.on('pageerror', (error) => problems.push(error.message))
+
+  await page.goto('/')
+  await chooseTheme(page, 'Scuro')
+  await page.getByRole('link', { name: 'Rosa' }).click()
+  await page.evaluate(() => document.fonts.ready)
+
+  expect(problems).toEqual([])
+})
