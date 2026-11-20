@@ -18,7 +18,7 @@
 
 ## 4. Browser tests
 
-- [ ] 4.1 Replace `e2e/home.spec.ts` with `e2e/navigation.spec.ts`: on a desktop viewport, the sidebar is visible, no hamburger button, every section is reachable from the menu and its entry is active; on a phone viewport, the menu is hidden, the drawer opens from the hamburger button, choosing "Rosa" navigates and closes it, Escape closes it without navigating; verify `make ui-e2e` passes
+- [x] 4.1 Replace `e2e/home.spec.ts` with `e2e/navigation.spec.ts`: on a desktop viewport, the sidebar is visible, no hamburger button, every section is reachable from the menu and its entry is active; on a phone viewport, the menu is hidden, the drawer opens from the hamburger button, choosing "Rosa" navigates and closes it, Escape closes it without navigating; verify `make ui-e2e` passes
 
 ## 5. Documentation
 
