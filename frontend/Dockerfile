@@ -11,7 +11,7 @@ COPY src ./src
 # The app is type-checked here; the tests and their configuration are checked in CI.
 RUN npx tsc -p tsconfig.app.json && npx vite build
 
-FROM nginxinc/nginx-unprivileged:1.28-alpine-slim
+FROM nginxinc/nginx-unprivileged:1.31-alpine-slim
 # Filled into the template at start by the base image's entrypoint; an origin, no path.
 ENV API_UPSTREAM=http://api:8000 \
     NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
