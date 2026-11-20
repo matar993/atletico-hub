@@ -252,3 +252,56 @@ class TestRenamePlayer:
         response = client.patch("/players/0", json={"first_name": "A", "last_name": "B"}, headers=WRITE_HEADER)
 
         assert response.status_code == 404
+
+
+class TestProfile:
+    def test_a_player_changes_their_own_name_and_the_squad_shows_it(
+        self, client: TestClient, db_session: DbSession
+    ) -> None:
+        sign_in(client, db_session, Role.PLAYER)
+
+        response = client.patch(
+            "/profile", json={"first_name": "Marco", "last_name": "Bianchi Rossi"}, headers=WRITE_HEADER
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {
+            "first_name": "Marco",
+            "last_name": "Bianchi Rossi",
+            "email": "player@example.com",
+            "role": "player",
+        }
+        assert client.get("/auth/me").json()["last_name"] == "Bianchi Rossi"
+        assert "Bianchi Rossi" in [p["last_name"] for p in client.get("/players").json()["items"]]
+
+    def test_an_empty_name_answers_422_and_changes_nothing(self, client: TestClient, db_session: DbSession) -> None:
+        account = sign_in(client, db_session, Role.PLAYER)
+
+        response = client.patch("/profile", json={"first_name": "  ", "last_name": "Rossi"}, headers=WRITE_HEADER)
+
+        assert response.status_code == 422
+        assert account.player.first_name == "Player"
+
+    def test_a_body_with_a_role_answers_422_and_changes_neither_name_nor_role(
+        self, client: TestClient, db_session: DbSession
+    ) -> None:
+        account = sign_in(client, db_session, Role.PLAYER)
+
+        response = client.patch(
+            "/profile", json={"first_name": "Marco", "last_name": "Rossi", "role": "admin"}, headers=WRITE_HEADER
+        )
+
+        assert response.status_code == 422
+        assert (account.player.first_name, account.role) == ("Player", Role.PLAYER)
+
+    def test_the_action_never_reaches_another_player(self, client: TestClient, db_session: DbSession) -> None:
+        sign_in(client, db_session, Role.PLAYER)
+        luca = Player(first_name="Luca", last_name="Bianchi")
+        db_session.add(luca)
+        db_session.flush()
+
+        client.patch(
+            "/profile", json={"first_name": "Marco", "last_name": "Rossi", "id": luca.id}, headers=WRITE_HEADER
+        )
+
+        assert (luca.first_name, luca.last_name) == ("Luca", "Bianchi")

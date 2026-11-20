@@ -141,6 +141,23 @@ export interface paths {
         patch: operations["rename_player_players__player_id__patch"];
         trace?: never;
     };
+    "/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Profile */
+        patch: operations["update_profile_profile_patch"];
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -276,6 +293,13 @@ export interface components {
         SquadPermissions: {
             /** Create */
             create: boolean;
+        };
+        /** UpdateProfileRequest */
+        UpdateProfileRequest: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -544,6 +568,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlayerName"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_profile_profile_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrentUser"];
                 };
             };
             /** @description Validation Error */

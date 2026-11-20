@@ -13,6 +13,11 @@ class RenamePlayerRequest(RequestModel):
     last_name: str
 
 
+class UpdateProfileRequest(RequestModel):
+    first_name: str
+    last_name: str
+
+
 class PlayerPermissions(BaseModel):
     update: bool
     create_invite: bool

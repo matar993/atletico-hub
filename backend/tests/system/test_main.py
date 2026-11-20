@@ -43,6 +43,7 @@ ROLE_TABLE = {
     ("GET", "/players"): (401, 200, 200),
     ("POST", "/players"): (401, 403, 422),
     ("PATCH", "/players/{player_id}"): (401, 403, 422),
+    ("PATCH", "/profile"): (401, 422, 422),
     ("POST", "/auth/invites"): (401, 403, 422),
 }
 
