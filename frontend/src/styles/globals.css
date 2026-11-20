@@ -1,19 +1,19 @@
 @import 'tailwindcss';
 
 /* Design tokens. Every color of the app comes from here: components use the Tailwind names mapped below, never raw
-   colors. Palette is a default until the official club colors are given. */
+   colors. Red and navy are the club colors, from the club website (#e10b00, #060843). */
 :root {
-  --background: oklch(0.985 0.003 255);
+  --background: oklch(0.985 0.004 270);
   --surface: oklch(1 0 0);
-  --surface-raised: oklch(0.965 0.006 255);
-  --foreground: oklch(0.21 0.02 255);
-  --muted-foreground: oklch(0.45 0.02 255);
-  --border: oklch(0.9 0.008 255);
-  --primary: oklch(0.5 0.2 27);
-  --primary-foreground: oklch(0.99 0 0);
-  --accent: oklch(0.94 0.025 27);
-  --accent-foreground: oklch(0.38 0.15 27);
-  --ring: oklch(0.55 0.2 27);
+  --surface-raised: oklch(0.965 0.01 270);
+  --foreground: oklch(0.19 0.095 270);
+  --muted-foreground: oklch(0.45 0.05 270);
+  --border: oklch(0.9 0.015 270);
+  --primary: oklch(0.574 0.232 29);
+  --primary-foreground: oklch(1 0 0);
+  --accent: oklch(0.95 0.03 29);
+  --accent-foreground: oklch(0.45 0.19 29);
+  --ring: oklch(0.574 0.232 29);
   --success: oklch(0.45 0.12 150);
   --warning: oklch(0.5 0.12 70);
   --danger: oklch(0.5 0.2 25);
@@ -23,17 +23,17 @@
 }
 
 .dark {
-  --background: oklch(0.17 0.015 255);
-  --surface: oklch(0.21 0.017 255);
-  --surface-raised: oklch(0.26 0.02 255);
-  --foreground: oklch(0.96 0.005 255);
-  --muted-foreground: oklch(0.74 0.015 255);
-  --border: oklch(0.32 0.02 255);
-  --primary: oklch(0.66 0.19 27);
-  --primary-foreground: oklch(0.15 0.02 255);
-  --accent: oklch(0.3 0.07 27);
-  --accent-foreground: oklch(0.92 0.05 27);
-  --ring: oklch(0.7 0.19 27);
+  --background: oklch(0.17 0.06 268);
+  --surface: oklch(0.21 0.07 268);
+  --surface-raised: oklch(0.27 0.075 268);
+  --foreground: oklch(0.97 0.006 270);
+  --muted-foreground: oklch(0.76 0.04 270);
+  --border: oklch(0.33 0.07 268);
+  --primary: oklch(0.66 0.21 29);
+  --primary-foreground: oklch(0.15 0.05 268);
+  --accent: oklch(0.3 0.09 29);
+  --accent-foreground: oklch(0.92 0.05 29);
+  --ring: oklch(0.7 0.19 29);
   --success: oklch(0.78 0.15 150);
   --warning: oklch(0.82 0.14 80);
   --danger: oklch(0.74 0.17 25);
