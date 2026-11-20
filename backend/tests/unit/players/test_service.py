@@ -4,7 +4,7 @@ import pytest
 
 from atletico_hub.auth.models import Account, Role
 from atletico_hub.players.models import Player
-from atletico_hub.players.service import InvalidPlayerNameError, PlayerService
+from atletico_hub.players.service import InvalidPlayerNameError, PlayerNotFoundError, PlayerService
 
 
 def actor_with(role: Role) -> Account:
@@ -32,6 +32,9 @@ class FakePlayerStore:
     def add(self, player: Player) -> Player:
         self.added.append(player)
         return player
+
+    def get(self, player_id: int) -> Player | None:
+        return next((player for player, _ in self._rows if player.id == player_id), None)
 
     def list_with_account(self) -> Sequence[tuple[Player, Account | None]]:
         return self._rows
@@ -99,3 +102,41 @@ class TestPlayerService:
             (True, "anna@example.com", True, True),
             (True, "boss@example.com", True, False),
         ]
+
+
+def luca_in_a_store() -> tuple[Player, FakePlayerStore]:
+    luca = Player(id=7, first_name="Luca", last_name="Bianchi")
+    return luca, FakePlayerStore([(luca, None)])
+
+
+class TestRename:
+    def test_rename_trims_the_names_and_commits(self) -> None:
+        _, store = luca_in_a_store()
+        transaction = FakeTransaction()
+
+        player = PlayerService(players=store, transaction=transaction).rename(
+            7, first_name=" Luca ", last_name=" Bianchi Rossi "
+        )
+
+        assert (player.first_name, player.last_name) == ("Luca", "Bianchi Rossi")
+        assert transaction.commits == 1
+
+    def test_rename_refuses_an_unknown_player(self) -> None:
+        _, store = luca_in_a_store()
+        transaction = FakeTransaction()
+
+        with pytest.raises(PlayerNotFoundError):
+            PlayerService(players=store, transaction=transaction).rename(8, first_name="Luca", last_name="Bianchi")
+
+        assert transaction.commits == 0
+
+    @pytest.mark.parametrize(("first_name", "last_name"), [(" ", "Bianchi"), ("Gigi", ""), ("L" * 51, "Bianchi")])
+    def test_rename_refuses_an_invalid_name_and_changes_nothing(self, first_name: str, last_name: str) -> None:
+        luca, store = luca_in_a_store()
+        transaction = FakeTransaction()
+
+        with pytest.raises(InvalidPlayerNameError):
+            PlayerService(players=store, transaction=transaction).rename(7, first_name=first_name, last_name=last_name)
+
+        assert transaction.commits == 0
+        assert (luca.first_name, luca.last_name) == ("Luca", "Bianchi")

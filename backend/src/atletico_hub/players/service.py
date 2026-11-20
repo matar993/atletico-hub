@@ -13,8 +13,14 @@ class InvalidPlayerNameError(Exception):
     pass
 
 
+class PlayerNotFoundError(Exception):
+    pass
+
+
 class PlayerStore(Protocol):
     def add(self, player: Player) -> Player: ...
+
+    def get(self, player_id: int) -> Player | None: ...
 
     def list_with_account(self) -> Sequence[tuple[Player, Account | None]]: ...
 
@@ -46,6 +52,15 @@ class PlayerService:
     def add_player(self, first_name: str, last_name: str) -> Player:
         player = Player(first_name=self._clean_name(first_name), last_name=self._clean_name(last_name))
         self._players.add(player)
+        self._transaction.commit()
+        return player
+
+    def rename(self, player_id: int, first_name: str, last_name: str) -> Player:
+        player = self._players.get(player_id)
+        if player is None:
+            raise PlayerNotFoundError(f"No player with id {player_id}")
+        cleaned_first_name, cleaned_last_name = self._clean_name(first_name), self._clean_name(last_name)
+        player.first_name, player.last_name = cleaned_first_name, cleaned_last_name
         self._transaction.commit()
         return player
 
