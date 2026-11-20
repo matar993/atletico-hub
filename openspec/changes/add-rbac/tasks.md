@@ -19,7 +19,7 @@
 - [x] 3.2 Add `PlayerService.rename(player_id, first_name, last_name)` (design D3); verify unit tests cover a valid rename, an unknown player and invalid names
 - [x] 3.3 Change `GET /players` to the `Squad` shape and add `PATCH /players/{player_id}` (`players:update`), with rows in the role matrix; verify system tests for each scenario of the `squad` delta spec
 - [x] 3.4 Add `PATCH /profile` (`profile:update`) in a profile router of the `players` package, wired in `create_app`, with rows in the role matrix; verify system tests for each API scenario of the `player-profile` delta spec, including 422 on a body with `role`
-- [ ] 3.5 Regenerate `frontend/src/lib/api/schema.d.ts` (`make ui-gen-api`); verify `make ui-typecheck` shows the places the new shape breaks
+- [x] 3.5 Regenerate `frontend/src/lib/api/schema.d.ts` (`make ui-gen-api`); verify `make ui-typecheck` shows the places the new shape breaks
 
 ## 4. Invites: no link for an admin
 
