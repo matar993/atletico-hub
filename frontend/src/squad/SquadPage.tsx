@@ -20,10 +20,10 @@ export function SquadPage() {
       actions={isAdmin ? <AddPlayerDialog /> : undefined}
     >
       {squad.isError && <p role="alert">Non riesco a caricare la rosa. Riprova tra poco.</p>}
-      {squad.data?.length === 0 && <EmptyState icon={Users}>Nessun giocatore in rosa.</EmptyState>}
-      {squad.data && squad.data.length > 0 && (
+      {squad.data?.items.length === 0 && <EmptyState icon={Users}>Nessun giocatore in rosa.</EmptyState>}
+      {squad.data && squad.data.items.length > 0 && (
         <ul className="space-y-3">
-          {squad.data.map((member) => (
+          {squad.data.items.map((member) => (
             <PlayerRow key={member.id} member={member} isAdmin={isAdmin} />
           ))}
         </ul>

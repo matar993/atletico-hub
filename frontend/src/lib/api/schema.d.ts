@@ -124,6 +124,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/players/{player_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Rename Player */
+        patch: operations["rename_player_players__player_id__patch"];
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -207,11 +224,40 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** PlayerName */
+        PlayerName: {
+            /** Id */
+            id: number;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+        };
+        /** PlayerPermissions */
+        PlayerPermissions: {
+            /** Update */
+            update: boolean;
+            /** Create Invite */
+            create_invite: boolean;
+        };
+        /** RenamePlayerRequest */
+        RenamePlayerRequest: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+        };
         /**
          * Role
          * @enum {string}
          */
         Role: "admin" | "player";
+        /** Squad */
+        Squad: {
+            permissions: components["schemas"]["SquadPermissions"];
+            /** Items */
+            items: components["schemas"]["SquadMember"][];
+        };
         /** SquadMember */
         SquadMember: {
             /** Id */
@@ -224,6 +270,12 @@ export interface components {
             has_account: boolean;
             /** Email */
             email: string | null;
+            permissions: components["schemas"]["PlayerPermissions"];
+        };
+        /** SquadPermissions */
+        SquadPermissions: {
+            /** Create */
+            create: boolean;
         };
         /** ValidationError */
         ValidationError: {
@@ -432,7 +484,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SquadMember"][];
+                    "application/json": components["schemas"]["Squad"];
                 };
             };
         };
@@ -457,6 +509,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SquadMember"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_player_players__player_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                player_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenamePlayerRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerName"];
                 };
             };
             /** @description Validation Error */

@@ -42,6 +42,7 @@ PASSWORD = "secret-pass"
 ROLE_TABLE = {
     ("GET", "/players"): (401, 200, 200),
     ("POST", "/players"): (401, 403, 422),
+    ("PATCH", "/players/{player_id}"): (401, 403, 422),
     ("POST", "/auth/invites"): (401, 403, 422),
 }
 
@@ -160,8 +161,9 @@ class TestRoleTable:
     ) -> None:
         clients = (client, signed_in_client(db_session, Role.PLAYER), signed_in_client(db_session, Role.ADMIN))
 
+        url = path.replace("{player_id}", "1")
         answers = tuple(
-            c.request(method, path, headers=WRITE_HEADER, json={} if method in WRITE_METHODS else None).status_code
+            c.request(method, url, headers=WRITE_HEADER, json={} if method in WRITE_METHODS else None).status_code
             for c in clients
         )
 
@@ -190,12 +192,12 @@ class TestStrictBodies:
         self, client: TestClient, db_session: DbSession, path: str, body: dict
     ) -> None:
         admin = signed_in_client(db_session, Role.ADMIN)
-        players_before = len(admin.get("/players").json())
+        players_before = len(admin.get("/players").json()["items"])
 
         response = admin.post(path, json=body, headers=WRITE_HEADER)
 
         assert response.status_code == 422
-        assert len(admin.get("/players").json()) == players_before
+        assert len(admin.get("/players").json()["items"]) == players_before
 
 
 class TestApiDocs:

@@ -19,10 +19,13 @@ async function openDrawer() {
 
 describe('AppLayout drawer', () => {
   beforeEach(() => {
-    vi.mocked(api.GET).mockResolvedValue({
-      data: { first_name: 'Anna', last_name: 'Rossi', email: 'anna@example.com', role: 'player' },
+    vi.mocked(api.GET).mockImplementation((async (path: string) => ({
+      data:
+        path === '/players'
+          ? { permissions: { create: false }, items: [] }
+          : { first_name: 'Anna', last_name: 'Rossi', email: 'anna@example.com', role: 'player' },
       response: new Response(null, { status: 200 }),
-    } as never)
+    })) as never)
   })
 
   it('is closed at first and the hamburger button says so', async () => {

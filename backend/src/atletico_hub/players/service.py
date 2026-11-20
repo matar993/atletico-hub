@@ -65,20 +65,21 @@ class PlayerService:
         return player
 
     def list_squad(self, actor: Account) -> Squad:
-        show_emails = can(actor, Permission.SQUAD_VIEW_EMAIL)
-        may_update = can(actor, Permission.PLAYERS_UPDATE)
-        may_invite = can(actor, Permission.INVITES_CREATE)
-        entries = [
-            SquadEntry(
-                player=player,
-                has_account=account is not None,
-                email=account.email if account is not None and show_emails else None,
-                update=may_update,
-                create_invite=may_invite and (account is None or account.role != Role.ADMIN),
-            )
-            for player, account in self._players.list_with_account()
-        ]
+        entries = [self._entry(actor, player, account) for player, account in self._players.list_with_account()]
         return Squad(create=can(actor, Permission.SQUAD_CREATE), entries=entries)
+
+    def describe_new(self, actor: Account, player: Player) -> SquadEntry:
+        return self._entry(actor, player, None)
+
+    @staticmethod
+    def _entry(actor: Account, player: Player, account: Account | None) -> SquadEntry:
+        return SquadEntry(
+            player=player,
+            has_account=account is not None,
+            email=account.email if account is not None and can(actor, Permission.SQUAD_VIEW_EMAIL) else None,
+            update=can(actor, Permission.PLAYERS_UPDATE),
+            create_invite=can(actor, Permission.INVITES_CREATE) and (account is None or account.role != Role.ADMIN),
+        )
 
     @staticmethod
     def _clean_name(name: str) -> str:

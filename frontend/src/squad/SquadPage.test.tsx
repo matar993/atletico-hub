@@ -11,12 +11,19 @@ const SQUAD = [
   { id: 2, first_name: 'Luca', last_name: 'Bianchi', has_account: false, email: null },
 ]
 
-function signInAs(role: 'admin' | 'player', squad: object[] = SQUAD) {
+function signInAs(role: 'admin' | 'player', squad: typeof SQUAD = SQUAD) {
   vi.mocked(api.GET).mockImplementation((async (path: string) =>
     path === '/auth/me'
       ? { data: { first_name: 'Me', last_name: 'Self', email: 'me@example.com', role }, response: OK() }
       : {
-          data: squad.map((member) => (role === 'admin' ? member : { ...member, email: null })),
+          data: {
+            permissions: { create: role === 'admin' },
+            items: squad.map((member) => ({
+              ...member,
+              email: role === 'admin' ? member.email : null,
+              permissions: { update: role === 'admin', create_invite: role === 'admin' },
+            })),
+          },
           response: OK(),
         }) as never)
 }
