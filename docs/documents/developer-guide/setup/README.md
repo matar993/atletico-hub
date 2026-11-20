@@ -72,6 +72,7 @@ make down   # stop everything; the volumes are kept
 | backend lint fix | `make lint-fix` | ruff check with the safe fixes |
 | backend format | `make autoformat` | ruff format |
 | backend types | `make typecheck` | ty check |
+| backend layers | `make lint-imports` | import-linter layer contracts ([ADR-0006](../../architecture/adr/0006-layered-feature-packages-in-the-api.md)) |
 | lock | `make lock` | Regenerate `backend/uv.lock` ([details](#backend-dependencies)) |
 | specs | `make validate` | `openspec validate --all --strict` |
 | web app checks | `make ui-checks` | Type check, lint, format check, unit tests and build |
@@ -79,14 +80,14 @@ make down   # stop everything; the volumes are kept
 | browser tests | `make ui-e2e` | Playwright, on the host |
 | API types | `make ui-gen-api` | Regenerate the web app's API types ([details](#web-app-development)) |
 
-`lint`, `lint-fix`, `autoformat` and `typecheck` need only uv. The `ui-*` targets other than `ui-e2e` run in the `ui` container, so the stack must be up. `ui-e2e` needs no stack.
+`lint`, `lint-fix`, `autoformat`, `typecheck` and `lint-imports` need only uv. The `ui-*` targets other than `ui-e2e` run in the `ui` container, so the stack must be up. `ui-e2e` needs no stack.
 
 ### Pre-commit hook
 
 `make hooks` installs it once per clone. It runs the checks of the areas a commit touches:
 
 - `openspec/`: `make validate`
-- `backend/`: ruff lint with the safe fixes, ruff format, ty
+- `backend/`: ruff lint with the safe fixes, ruff format, ty, import-linter
 - `frontend/`: lint, format check, unit tests and build
 - `backend/` or `frontend/`: `schema.d.ts` matches the API
 
@@ -116,7 +117,7 @@ docker compose exec -T db psql -U atletico -d atletico -Atc \
 | Job | Runs on changes to | Does |
 |---|---|---|
 | `openspec-validate` | `openspec/` | `openspec validate --all --strict` |
-| `backend-checks` | `backend/` | ruff check, ruff format check, ty |
+| `backend-checks` | `backend/` | ruff check, ruff format check, ty, import-linter |
 | `backend-tests` | `backend/` | pytest with coverage, against a Postgres service |
 | `ui-checks` | `frontend/` | type check, lint, format check, unit tests, build |
 | `ui-e2e` | `frontend/` | Playwright on the production build, in the Playwright image of the locked version |

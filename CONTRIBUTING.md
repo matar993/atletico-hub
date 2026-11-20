@@ -55,7 +55,7 @@ Decisions that span the whole project are recorded as ADRs in `docs/documents/ar
 
 ## Definition of Done
 
-- Before every commit on backend code, run `make lint-fix`, `make autoformat` and `make typecheck`, and fix every failure.
+- Before every commit on backend code, run `make lint-fix`, `make autoformat`, `make typecheck` and `make lint-imports`, and fix every failure.
 - Before every push of code changes, run `make test` and fix every failure. Skip it when the commits since the last green run change only docs, comments or other chores that cannot affect the code, or when a maintainer asks to skip it: the CI workflow is the final safety net. The 90% coverage floor stays (see [Commands and checks](docs/documents/developer-guide/setup/README.md#commands-and-checks)).
 - `make ui-checks` and `make ui-e2e` pass when the web app changes.
 - After a change to an API route, `make ui-gen-api` ran and `frontend/src/lib/api/schema.d.ts` is committed.

@@ -26,7 +26,21 @@ line-length = 120
 include = ["src/atletico_hub/**/*.py", "tests/**/*.py"]
 
 [tool.ruff.lint]
-extend-select = ["I", "B", "UP", "SIM"]
+# C90: complexity, N: PEP 8 names, PL: Pylint (arguments, branches, magic values).
+extend-select = ["I", "B", "UP", "SIM", "C90", "N", "PL"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 8
+
+[tool.ruff.lint.pylint]
+max-args = 5
+max-branches = 8
+max-returns = 4
+max-statements = 30
+
+[tool.ruff.lint.per-file-ignores]
+# Tests compare against literal expected values.
+"tests/**/*.py" = ["PLR2004"]
 
 [tool.ty.src]
 include = ["src/atletico_hub/**/*.py", "tests/**/*.py"]
@@ -44,9 +58,33 @@ fail_under = 90
 [dependency-groups]
 dev = [
     "httpx>=0.28",
+    "import-linter>=2.17",
     "pytest>=9",
     "pytest-cov>=7",
     "pytest-xdist>=3.8",
     "ruff>=0.14",
     "ty>=0.0.1a20",
 ]
+
+# Layer rules of ADR-0006, checked by `make lint-imports`. Each feature package
+# `atletico_hub/<feature>/` holds the layers it needs; a missing layer is allowed.
+[tool.importlinter]
+root_package = "atletico_hub"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Feature layers: router > service > schemas > repository > models"
+type = "layers"
+containers = ["atletico_hub.*"]
+layers = ["(router)", "(service)", "(schemas)", "(repository)", "(models)"]
+
+[[tool.importlinter.contracts]]
+name = "Only routers know HTTP"
+type = "forbidden"
+source_modules = [
+    "atletico_hub.*.service",
+    "atletico_hub.*.schemas",
+    "atletico_hub.*.repository",
+    "atletico_hub.*.models",
+]
+forbidden_modules = ["fastapi", "starlette"]
