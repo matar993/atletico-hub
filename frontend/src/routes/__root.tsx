@@ -1,4 +1,11 @@
-import { createRootRoute } from '@tanstack/react-router'
-import { AppLayout } from '@/layout/AppLayout'
+import type { QueryClient } from '@tanstack/react-query'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import { ThemeProvider } from '@/theme/ThemeProvider'
 
-export const Route = createRootRoute({ component: AppLayout })
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  component: () => (
+    <ThemeProvider>
+      <Outlet />
+    </ThemeProvider>
+  ),
+})

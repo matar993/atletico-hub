@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { CURRENT_USER_KEY } from './auth/currentUser'
+import { api, createAuthMiddleware } from './lib/api/client'
 import { routeTree } from './routeTree.gen'
 import '@fontsource/inter/latin-400.css'
 import '@fontsource/inter/latin-500.css'
@@ -12,7 +14,15 @@ import '@fontsource/jetbrains-mono/latin-500.css'
 import './styles/globals.css'
 
 const queryClient = new QueryClient()
-const router = createRouter({ routeTree })
+const router = createRouter({ routeTree, context: { queryClient } })
+
+// A 401 from any route that needs a session: forget the user and go to login, then back to this page.
+api.use(
+  createAuthMiddleware(() => {
+    queryClient.removeQueries({ queryKey: CURRENT_USER_KEY })
+    void router.navigate({ to: '/login', search: { redirect: router.state.location.href } })
+  }),
+)
 
 declare module '@tanstack/react-router' {
   interface Register {

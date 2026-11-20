@@ -37,6 +37,8 @@ services:
       DB_USER: ${DB_USER:-atletico}
       DB_PASS: ${DB_PASS:-atletico}
       DB_DATABASE: ${DB_DATABASE:-atletico}
+      # The local stack runs on plain HTTP, and browsers drop Secure cookies there.
+      AUTH_COOKIE_SECURE: "false"
     depends_on:
       - db
 

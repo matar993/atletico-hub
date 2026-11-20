@@ -27,3 +27,6 @@ class TestMigrations:
             command.downgrade(config=config, revision="base")
             assert inspect(connection).get_table_names() == ["alembic_version"]
             command.upgrade(config=config, revision="head")
+
+    def test_upgrade_creates_the_squad_and_auth_tables(self, db_engine: Engine) -> None:
+        assert {"players", "accounts", "sessions", "invites"} <= set(inspect(db_engine).get_table_names())

@@ -1,6 +1,6 @@
 .PHONY: lock test lint typecheck lint-imports lint-fix autoformat \
 	ui-typecheck ui-lint ui-format ui-format-check ui-test ui-build ui-checks ui-e2e ui-gen-api \
-	validate hooks up down logs ps
+	create-admin validate hooks up down logs ps
 
 # ---- Backend ----
 
@@ -13,6 +13,10 @@ TEST_WORKERS ?= 4
 test:
 # MIGRATE_DB=false: the tests migrate their own databases, never the dev one.
 	docker compose run --rm -e MIGRATE_DB=false api pytest tests -n $(TEST_WORKERS) --cov --cov-report=term
+
+# Creates the first admin account. Asks for first name, last name, email and password. The stack must be up (`make up`).
+create-admin:
+	docker compose exec api python -m atletico_hub.auth.cli
 
 # Lints the backend with ruff from the uv environment of `backend/`. Fails on any finding.
 lint:
