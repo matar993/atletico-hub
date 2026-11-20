@@ -1,11 +1,13 @@
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session as DbSession
 
-from atletico_hub.auth.models import Account, Role
+from atletico_hub.auth.models import Account
 from atletico_hub.auth.passwords import Argon2PasswordHasher
+from atletico_hub.auth.permissions import Permission, can
 from atletico_hub.auth.repository import AuthRepository
 from atletico_hub.auth.service import SESSION_DURATION, AuthService, InvalidSessionError
 from atletico_hub.auth.settings import AuthSettings
@@ -66,7 +68,11 @@ def current_account(
     return account
 
 
-def require_admin(account: Annotated[Account, Depends(current_account)]) -> Account:
-    if account.role != Role.ADMIN:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Admin only")
-    return account
+def require(permission: Permission) -> Callable[..., Account]:
+    def check(account: Annotated[Account, Depends(current_account)]) -> Account:
+        if not can(account, permission):
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Not allowed")
+        return account
+
+    check.permission = permission  # ty: ignore[missing-attribute]
+    return check

@@ -4,7 +4,7 @@ How to move between the sections of the web app.
 
 ## Sections
 
-The menu lists six sections, in this order:
+The menu lists six sections, in this order. An admin sees a seventh, Utenti, at the end:
 
 | Section | Path |
 |---|---|
@@ -14,8 +14,9 @@ The menu lists six sections, in this order:
 | Rosa | `/squad` |
 | Notifiche | `/notifications` |
 | Profilo | `/profile` |
+| Utenti (admins only) | `/users` |
 
-Every section needs a [login](login.md). Rosa lists the players of the squad ([invite links](invite-links.md) explains the admin actions). The other sections show a title, one line that says what they will be for, and an empty state. They show no real data yet, except Home, which shows [panels with sample content](#home).
+Every section needs a [login](login.md). Rosa lists the players of the squad ([invite links](invite-links.md) explains the admin actions). [Profilo](profile.md) shows your data and changes your name. [Utenti](users.md) lists the accounts and their roles. The other sections show a title, one line that says what they will be for, and an empty state. They show no real data yet, except Home, which shows [panels with sample content](#home).
 
 The header stays at the top while you scroll. It shows the team name, "Atletico San Lorenzo", your name, the theme control and the logout button. The section you are in is highlighted in the menu.
 

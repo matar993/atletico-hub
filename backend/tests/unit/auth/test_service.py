@@ -7,6 +7,8 @@ from atletico_hub.auth.service import (
     DUMMY_PASSWORD_HASH,
     INVITE_DURATION,
     AccountLockedError,
+    AccountNotFoundError,
+    AdminAccountError,
     AuthService,
     EmailInUseError,
     EmailRequiredError,
@@ -341,6 +343,25 @@ class TestAuthService:
         with pytest.raises(PlayerNotFoundError):
             service.create_invite(player_id=99)
 
+    @pytest.mark.parametrize(("role", "refused"), [(Role.ADMIN, True), (Role.PLAYER, False)])
+    def test_create_invite_refuses_a_player_whose_account_is_admin_and_stores_nothing(
+        self, role: Role, refused: bool
+    ) -> None:
+        store = FakeAuthStore()
+        player = Player(id=1, first_name="Anna", last_name="Rossi")
+        store.players.append(player)
+        store.accounts.append(Account(player=player, email="a@example.com", password_hash="x", role=role))
+        transaction = FakeTransaction()
+        service = AuthService(store=store, hasher=FakeHasher(), clock=FakeClock(START), transaction=transaction)
+
+        if refused:
+            with pytest.raises(AdminAccountError):
+                service.create_invite(player_id=1)
+            assert (store.invites, transaction.commits) == ([], 0)
+        else:
+            service.create_invite(player_id=1)
+            assert len(store.invites) == 1
+
     def test_create_invite_cancels_the_earlier_links_of_the_player(self) -> None:
         store = FakeAuthStore()
         store.players.append(Player(id=1, first_name="Anna", last_name="Rossi"))
@@ -485,7 +506,7 @@ class TestAuthService:
                 player=player,
                 email="anna@example.com",
                 password_hash="hashed:old-password",
-                role=Role.ADMIN,
+                role=Role.PLAYER,
                 failed_logins=0,
             )
         )
@@ -501,7 +522,7 @@ class TestAuthService:
         with pytest.raises(InvalidSessionError):
             service.authenticate(token=second_phone)
         assert service.authenticate(token=third_device) == account
-        assert (account.email, account.role) == ("anna@example.com", Role.ADMIN)
+        assert (account.email, account.role) == ("anna@example.com", Role.PLAYER)
         service.login(email="anna@example.com", password="new-password")
         with pytest.raises(InvalidCredentialsError):
             service.login(email="anna@example.com", password="old-password")
@@ -566,4 +587,54 @@ class TestAuthService:
             )
 
         assert len(store.accounts) == 1
+        assert transaction.commits == 0
+
+
+class TestResetPassword:
+    @staticmethod
+    def admin_with_a_session() -> tuple[AuthService, FakeAuthStore, FakeTransaction, Account]:
+        store = FakeAuthStore()
+        account = Account(
+            id=1,
+            player=Player(id=1, first_name="Anna", last_name="Rossi"),
+            email="anna@example.com",
+            password_hash="hashed:old-password",
+            role=Role.ADMIN,
+            failed_logins=3,
+            locked_until=START + timedelta(minutes=5),
+        )
+        store.accounts.append(account)
+        store.sessions.append(Session(account=account, token_hash="t", last_used_at=START, created_at=START))
+        transaction = FakeTransaction()
+        service = AuthService(store=store, hasher=FakeHasher(), clock=FakeClock(START), transaction=transaction)
+        return service, store, transaction, account
+
+    def test_sets_the_new_password_ends_the_sessions_clears_the_lockout_and_commits(self) -> None:
+        service, store, transaction, account = self.admin_with_a_session()
+
+        service.reset_password(" Anna@Example.com ", "new-password")
+
+        assert account.password_hash == "hashed:new-password"
+        assert (account.failed_logins, account.locked_until) == (0, None)
+        assert store.sessions == []
+        assert transaction.commits == 1
+
+    def test_refuses_an_unknown_email_and_changes_nothing(self) -> None:
+        service, store, transaction, account = self.admin_with_a_session()
+
+        with pytest.raises(AccountNotFoundError):
+            service.reset_password("nobody@example.com", "new-password")
+
+        assert account.password_hash == "hashed:old-password"
+        assert len(store.sessions) == 1
+        assert transaction.commits == 0
+
+    def test_refuses_a_password_of_7_characters_and_changes_nothing(self) -> None:
+        service, store, transaction, account = self.admin_with_a_session()
+
+        with pytest.raises(InvalidPasswordError):
+            service.reset_password("anna@example.com", "1234567")
+
+        assert account.password_hash == "hashed:old-password"
+        assert len(store.sessions) == 1
         assert transaction.commits == 0

@@ -13,6 +13,9 @@ dependencies = [
     "uvicorn[standard]>=0.54.0",
 ]
 
+[project.scripts]
+atletico-hub = "atletico_hub.auth.cli:main"
+
 [tool.uv]
 package = true
 

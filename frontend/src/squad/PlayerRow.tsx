@@ -4,12 +4,13 @@ import { api } from '@/lib/api/client'
 import { apiErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/lib/api/schema'
 import { BUTTON_SECONDARY, FORM_ERROR } from '@/ui/classes'
+import { RenamePlayerDialog } from './RenamePlayerDialog'
 
 type Member = components['schemas']['SquadMember']
 
 type Invite = { link: string; expiresAt: string }
 
-export function PlayerRow({ member, isAdmin }: { member: Member; isAdmin: boolean }) {
+export function PlayerRow({ member }: { member: Member }) {
   const [invite, setInvite] = useState<Invite | null>(null)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -39,14 +40,17 @@ export function PlayerRow({ member, isAdmin }: { member: Member; isAdmin: boolea
           </p>
           <p className="text-sm text-muted-foreground">
             {member.has_account ? 'Ha un account' : 'Senza account'}
-            {isAdmin && member.email && ` · ${member.email}`}
+            {member.email && ` · ${member.email}`}
           </p>
         </div>
-        {isAdmin && (
-          <button type="button" onClick={createInvite} className={BUTTON_SECONDARY}>
-            Crea link d&apos;invito
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {member.permissions.update && <RenamePlayerDialog member={member} />}
+          {member.permissions.create_invite && (
+            <button type="button" onClick={createInvite} className={BUTTON_SECONDARY}>
+              Crea link d&apos;invito
+            </button>
+          )}
+        </div>
       </div>
       {error && (
         <p role="alert" className={FORM_ERROR}>

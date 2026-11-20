@@ -7,10 +7,11 @@ from atletico_hub.auth.dependencies import (
     current_account,
     get_auth_service,
     get_auth_settings,
-    require_admin,
+    require,
     set_session_cookie,
 )
 from atletico_hub.auth.models import Account
+from atletico_hub.auth.permissions import Permission
 from atletico_hub.auth.schemas import (
     AcceptInviteRequest,
     CreateInviteRequest,
@@ -21,6 +22,7 @@ from atletico_hub.auth.schemas import (
 )
 from atletico_hub.auth.service import (
     AccountLockedError,
+    AdminAccountError,
     AuthService,
     EmailInUseError,
     EmailRequiredError,
@@ -63,12 +65,16 @@ def me(account: Annotated[Account, Depends(current_account)]) -> CurrentUser:
     return CurrentUser.from_account(account)
 
 
-@router.post("/invites", dependencies=[Depends(require_admin)])
+@router.post("/invites", dependencies=[Depends(require(Permission.INVITES_CREATE))])
 def create_invite(body: CreateInviteRequest, service: ServiceDep) -> InviteCreated:
     try:
         token, invite = service.create_invite(player_id=body.player_id)
     except PlayerNotFoundError as ex:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Player not found") from ex
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Giocatore non trovato") from ex
+    except AdminAccountError as ex:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, detail="La password di un admin si reimposta solo da riga di comando"
+        ) from ex
     return InviteCreated(path=f"/invite/{token}", expires_at=invite.expires_at)
 
 

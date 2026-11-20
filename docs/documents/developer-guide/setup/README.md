@@ -57,6 +57,37 @@ make create-admin   # asks for first name, last name, email and password
 
 The command refuses an email already in use and a password outside 8 to 128 characters. The admin then signs in on the web app and adds players and invite links.
 
+### Commands on the API host
+
+The API image installs the `atletico-hub` command. It has three subcommands, and each asks for its input on the terminal. The password is read without echo.
+
+| Subcommand | What it does | Fails when |
+|---|---|---|
+| `create-admin` | Creates a player with an admin account. Asks for first name, last name, email and password. | The email is in use, or the password is outside 8 to 128 characters. |
+| `promote` | Gives the admin role to the account with an email, even when no admin is left. Cancels the open invite links of that player. | No account has the email. |
+| `reset-password` | Sets a new password for the account with an email. Ends the sessions of the account and clears a login lockout. | No account has the email, or the password is outside 8 to 128 characters. |
+
+On a failure the command prints `Error: <reason>`, changes nothing and exits with status 1.
+
+`reset-password` is the only way to reset the password of an admin: the web app never makes an invite link for an admin account.
+
+On the local stack, use the `make` targets, which run the command in the `api` container:
+
+```bash
+make create-admin
+make promote          # asks for the email
+make reset-password   # asks for the email and the new password
+```
+
+On a deployed host, run the command in the API container. The `-it` flags are needed for the prompts:
+
+```bash
+docker exec -it <api-container> atletico-hub promote
+docker exec -it <api-container> atletico-hub reset-password
+```
+
+`atletico-hub --help` lists the subcommands.
+
 ### Notes
 
 - Edits to `backend/src/atletico_hub/` reload the API without a rebuild. Edits to `frontend/` reload the web app.
@@ -65,6 +96,7 @@ The command refuses an email already in use and a password outside 8 to 128 char
 - To start from an empty database, run `docker compose down -v`: it also deletes the volumes.
 - `example.env` lists the variables you can set.
 - `AUTH_COOKIE_SECURE` sets the `Secure` flag of the session cookie. It defaults to `true`. `compose.yaml` sets it to `false`, because the local stack runs on plain HTTP and Safari drops `Secure` cookies there. Keep it `true` on any deploy behind HTTPS.
+- `API_DOCS_ENABLED` turns on `/docs`, `/redoc` and `/openapi.json`. It defaults to `false`, so a deployed API shows no documentation page. `compose.yaml` sets it to `true`, because `make ui-gen-api` reads `/openapi.json` from the local stack. Keep it `false` on any deploy.
 - When the web app does not reload on file changes, set `VITE_POLLING=1` in `.env`.
 
 ## Technology stack
@@ -85,6 +117,8 @@ The command refuses an email already in use and a password outside 8 to 128 char
 | backend types | `make typecheck` | ty check |
 | backend layers | `make lint-imports` | import-linter layer contracts ([ADR-0006](../../architecture/adr/0006-layered-feature-packages-in-the-api.md)) |
 | first admin | `make create-admin` | Create the first admin account ([details](#create-the-first-admin)) |
+| promote | `make promote` | Give the admin role to an account ([details](#commands-on-the-api-host)) |
+| reset password | `make reset-password` | Set a new password for an account ([details](#commands-on-the-api-host)) |
 | lock | `make lock` | Regenerate `backend/uv.lock` ([details](#backend-dependencies)) |
 | specs | `make validate` | `openspec validate --all --strict` |
 | web app checks | `make ui-checks` | Type check, lint, format check, unit tests and build |

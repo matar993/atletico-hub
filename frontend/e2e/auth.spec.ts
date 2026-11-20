@@ -5,7 +5,7 @@ test.use({ viewport: { width: 1280, height: 800 } })
 
 test('a section without a session opens login and returns to it after login', async ({ page }) => {
   await signedOut(page)
-  await page.route('**/api/players', (route) => route.fulfill({ json: [] }))
+  await page.route('**/api/players', (route) => route.fulfill({ json: { permissions: { create: false }, items: [] } }))
   await page.route('**/api/auth/login', (route) => route.fulfill({ json: USER }))
 
   await page.goto('/squad')

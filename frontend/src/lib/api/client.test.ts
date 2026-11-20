@@ -5,11 +5,12 @@ import type { paths } from './schema'
 
 function setup(status = 200) {
   const onUnauthorized = vi.fn()
+  const onForbidden = vi.fn()
   const fetchMock = vi.fn(async () => new Response(status === 204 ? null : '{}', { status }))
   const client = createClient<paths>({ baseUrl: 'http://localhost/api', fetch: fetchMock })
-  client.use(createAuthMiddleware(onUnauthorized))
+  client.use(createAuthMiddleware(onUnauthorized, onForbidden))
   const sentRequest = () => (fetchMock.mock.calls[0] as unknown as [Request])[0]
-  return { client, onUnauthorized, sentRequest }
+  return { client, onUnauthorized, onForbidden, sentRequest }
 }
 
 describe('auth middleware', () => {
@@ -35,6 +36,35 @@ describe('auth middleware', () => {
     await client.GET('/players')
 
     expect(onUnauthorized).toHaveBeenCalledOnce()
+  })
+
+  it('calls onForbidden on a 403 and not onUnauthorized', async () => {
+    const { client, onUnauthorized, onForbidden } = setup(403)
+
+    await client.GET('/players')
+
+    expect(onForbidden).toHaveBeenCalledOnce()
+    expect(onUnauthorized).not.toHaveBeenCalled()
+  })
+
+  it('does not call onForbidden on a 401 or a success', async () => {
+    const unauthorized = setup(401)
+    const ok = setup(200)
+
+    await unauthorized.client.GET('/players')
+    await ok.client.GET('/players')
+
+    expect(unauthorized.onForbidden).not.toHaveBeenCalled()
+    expect(ok.onForbidden).not.toHaveBeenCalled()
+  })
+
+  // A rule that refuses an action answers 409: the page shows its message, the user stays on it.
+  it('does not call onForbidden on a 409', async () => {
+    const { client, onForbidden } = setup(409)
+
+    await client.POST('/auth/invites', { body: { player_id: 1 } })
+
+    expect(onForbidden).not.toHaveBeenCalled()
   })
 
   it.each([
