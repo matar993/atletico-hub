@@ -2,10 +2,10 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import DateTime, Enum, ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from atletico_hub.db.base import Base
-from atletico_hub.players.models import utc_now
+from atletico_hub.players.models import Player, utc_now
 
 
 class Role(enum.StrEnum):
@@ -26,6 +26,7 @@ class Account(Base):
     failed_logins: Mapped[int] = mapped_column(default=0)
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    player: Mapped[Player] = relationship()
 
 
 class Session(Base):
@@ -36,6 +37,7 @@ class Session(Base):
     token_hash: Mapped[str] = mapped_column(String(64), unique=True)
     last_used_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    account: Mapped[Account] = relationship()
 
 
 class Invite(Base):
