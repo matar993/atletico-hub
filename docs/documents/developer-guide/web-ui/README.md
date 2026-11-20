@@ -1,9 +1,9 @@
 # Web app UI
 
-How the look of the web app is built: design tokens, themes, contrast.
+How the look of the web app is built: design tokens, themes, components, contrast.
 
-> **Source**: `frontend/src/styles/globals.css`
-> **Last update**: 2026-11-20 · **Scope**: design tokens, contrast · **Markers**: palette is a default until the official club colors are given
+> **Source**: `frontend/src/styles/globals.css`, `frontend/public/theme-init.js`, `frontend/src/theme/`, `frontend/src/layout/`
+> **Last update**: 2026-11-20 · **Scope**: design tokens, theme, adding a component, contrast · **Markers**: palette is a default until the official club colors are given
 
 ## Design tokens
 
@@ -19,6 +19,23 @@ How the look of the web app is built: design tokens, themes, contrast.
 | `success`, `warning`, `danger` | Status colors, used as text on `background` or `surface` |
 
 Fonts are Inter (400, 500, 600, 700) and JetBrains Mono (400, 500), self-hosted through `@fontsource` and imported in `frontend/src/main.tsx`.
+
+## Theme
+
+Light is the default of `:root`; dark is the `.dark` class on `<html>`. The choice (`light`, `dark`, `system`) is kept in `localStorage` under the key `theme`.
+
+- `frontend/public/theme-init.js` runs in `<head>` before the CSS and sets the class before the first paint. It is a file, not inline code, because the Content-Security-Policy forbids inline scripts.
+- `ThemeProvider` (`frontend/src/theme/`) keeps the choice in React, saves it, and follows the system when the choice is `system`. `useTheme` reads it. `ThemeMenu` is the header control.
+- Every storage access sits in `try/catch`: when storage is blocked the app uses `system`.
+
+## Add a component
+
+1. Style it with token classes only (`bg-surface`, `text-muted-foreground`, `border-border`). Never write a raw color, and never use `dark:` variants: the tokens already change with the theme.
+2. Accept `className` only when a caller needs it, and merge with `cn()` from `frontend/src/lib/cn.ts` (`twMerge(clsx(...))`).
+3. Use `Page` and `EmptyState` (`frontend/src/layout/`) for a section page: one `h1`, eyebrow, description, actions.
+4. Use Radix for overlays and menus (`@radix-ui/react-dialog`, `@radix-ui/react-dropdown-menu`) and `framer-motion` for movement. The app wraps everything in `MotionConfig reducedMotion="user"`, so a slide turns off for users who ask for less motion.
+5. Add a unit test that queries by role and accessible name. Add a Playwright spec when behavior needs a real browser.
+6. If the component adds a color pair, check it reaches 4.5:1 in both themes and add it to the table below.
 
 ## Contrast
 

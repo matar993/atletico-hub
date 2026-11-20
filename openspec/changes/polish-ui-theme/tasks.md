@@ -29,7 +29,7 @@
 
 ## 6. Documentation and final checks
 
-- [ ] 6.1 Update `docs/documents/user-guide/navigation.md` (theme control, Home panels), add a design tokens and "add a component" section to the developer guide, update `ARCHITECTURE.md` "Today"; verify links resolve
+- [x] 6.1 Update `docs/documents/user-guide/navigation.md` (theme control, Home panels), add a design tokens and "add a component" section to the developer guide, update `ARCHITECTURE.md` "Today"; verify links resolve
 - [ ] 6.2 Run `make ui-checks` and `make ui-e2e` on the final tree; verify both pass, then capture light and dark screenshots of Home on phone and desktop for review
 
 ## Workflow follow-up

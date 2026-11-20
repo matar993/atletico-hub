@@ -15,9 +15,25 @@ The menu lists six sections, in this order:
 | Notifiche | `/notifications` |
 | Profilo | `/profile` |
 
-Every section shows a title, one line that says what it will be for, and an empty state. No section shows real data yet.
+Every section shows a title, one line that says what it will be for, and an empty state. No section shows real data yet, except Home, which shows [panels with sample content](#home).
 
-The header shows the team name, "Atletico San Lorenzo". The section you are in is highlighted in the menu.
+The header stays at the top while you scroll. It shows the team name, "Atletico San Lorenzo", and the theme control. The section you are in is highlighted in the menu.
+
+## Home
+
+Home shows three panels: "Prossimi eventi", "Convocazioni" and "Notifiche". The title of each panel is a link to its section. The content of the panels is sample content, not data of the team: each panel carries the label "Anteprima".
+
+## Theme
+
+The theme button in the header ("Tema") opens a menu with three choices:
+
+| Choice | Effect |
+|---|---|
+| Chiaro | Light theme |
+| Scuro | Dark theme |
+| Sistema | Follows the theme of your device, and changes when the device changes |
+
+Without a choice, the app follows the device. The choice is kept in the browser and applies from the first moment the page shows. If the browser blocks storage, the app still works and follows the device. When the device asks for reduced motion, the drawer appears without sliding.
 
 ## On a wide screen
 
