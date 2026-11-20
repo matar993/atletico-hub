@@ -48,7 +48,7 @@
 ## 8. Browser tests
 
 - [x] 8.1 Add a shared `page.route` stub for `/api/auth/me` and use it in `e2e/navigation.spec.ts` and `e2e/theme.spec.ts`; verify `make ui-e2e` passes
-- [ ] 8.2 Add `e2e/auth.spec.ts`: a section without a session opens login and returns to it after login; logout opens login; verify `make ui-e2e` passes
+- [x] 8.2 Add `e2e/auth.spec.ts`: a section without a session opens login and returns to it after login; logout opens login; verify `make ui-e2e` passes
 
 ## 9. Documentation
 
