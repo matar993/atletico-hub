@@ -12,8 +12,9 @@ from atletico_hub.auth.dependencies import require
 from atletico_hub.auth.models import Account, Role
 from atletico_hub.auth.passwords import Argon2PasswordHasher
 from atletico_hub.auth.permissions import Permission
-from atletico_hub.main import app
+from atletico_hub.main import app, create_app
 from atletico_hub.players.models import Player
+from atletico_hub.settings import ApiSettings
 
 WRITE_HEADER = {"X-Requested-With": "atletico-hub"}
 WRITE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
@@ -195,3 +196,27 @@ class TestStrictBodies:
 
         assert response.status_code == 422
         assert len(admin.get("/players").json()) == players_before
+
+
+class TestApiDocs:
+    PAGES = ("/openapi.json", "/docs", "/redoc")
+
+    def test_pages_answer_404_by_default(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("API_DOCS_ENABLED", raising=False)
+        client = TestClient(create_app(ApiSettings()))
+
+        assert [client.get(page).status_code for page in self.PAGES] == [404, 404, 404]
+
+    def test_pages_answer_when_the_setting_is_on(self) -> None:
+        client = TestClient(create_app(ApiSettings(docs_enabled=True)))
+
+        assert [client.get(page).status_code for page in self.PAGES] == [200, 200, 200]
+
+    def test_the_schema_is_available_in_code_with_the_pages_off(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("API_DOCS_ENABLED", raising=False)
+        assert "/players" in create_app(ApiSettings()).openapi()["paths"]
+
+    def test_the_setting_reads_the_environment(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("API_DOCS_ENABLED", "true")
+
+        assert ApiSettings().docs_enabled is True

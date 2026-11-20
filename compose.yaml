@@ -39,6 +39,8 @@ services:
       DB_DATABASE: ${DB_DATABASE:-atletico}
       # The local stack runs on plain HTTP, and browsers drop Secure cookies there.
       AUTH_COOKIE_SECURE: "false"
+      # Serves /docs, /redoc and /openapi.json. `make ui-gen-api` reads /openapi.json.
+      API_DOCS_ENABLED: "true"
     depends_on:
       - db
 

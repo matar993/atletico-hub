@@ -10,7 +10,7 @@
 ## 2. Strict bodies and API documentation
 
 - [x] 2.1 Add `RequestModel` with `extra="forbid"` in `atletico_hub/schemas.py` and make every request schema inherit it (design D10); verify system tests show 422 for an unknown field on login, add player, create invite and accept invite, with nothing changed
-- [ ] 2.2 Add `ApiSettings` and `create_app(settings)` (design D11), set `API_DOCS_ENABLED` in `compose.yaml` and `example.env`; verify system tests show `/openapi.json`, `/docs` and `/redoc` answer 404 by default and answer with the setting on, and that `app.openapi()` still returns the schema
+- [x] 2.2 Add `ApiSettings` and `create_app(settings)` (design D11), set `API_DOCS_ENABLED` in `compose.yaml` and `example.env`; verify system tests show `/openapi.json`, `/docs` and `/redoc` answer 404 by default and answer with the setting on, and that `app.openapi()` still returns the schema
 - [ ] 2.3 Document `API_DOCS_ENABLED` in `docs/documents/developer-guide/setup/README.md`; verify `make ui-gen-api` runs as written on the stack
 
 ## 3. Squad and profile: flags and name change
