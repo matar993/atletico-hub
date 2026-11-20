@@ -1,7 +1,7 @@
 # ADR-0008: Routes check permissions mapped from roles in code; answers carry the actions the user may take on each resource
 
 **Date**: 2026-11-20
-**Status**: proposed
+**Status**: accepted
 **Deciders**: Marco Scalzo
 
 ## Context
