@@ -56,7 +56,7 @@
 
 ## 10. Integration check
 
-- [ ] 10.1 Run `make test`, `make lint`, `make typecheck`, `make lint-imports`, `make ui-checks`, `make ui-e2e` and `make validate` on the final tree; verify all pass, and walk the flow by hand on the stack: create the admin, add a player, create a link, register in a private window, log out, log in
+- [x] 10.1 Run `make test`, `make lint`, `make typecheck`, `make lint-imports`, `make ui-checks`, `make ui-e2e` and `make validate` on the final tree; verify all pass, and walk the flow by hand on the stack: create the admin, add a player, create a link, register in a private window, log out, log in
 
 ## Workflow follow-up
 
