@@ -155,3 +155,24 @@ class TestChangeRole:
 
         assert client.get(f"/auth/invites/{token}").status_code == 404
         assert db_session.scalars(select(Invite).where(Invite.used_at.is_(None))).all() == []
+
+    def test_an_invite_link_created_before_a_promotion_cannot_reset_the_admin_password(
+        self, client: TestClient, db_session: DbSession
+    ) -> None:
+        anna = add_account(db_session, "Anna", "Rossi", Role.ADMIN)
+        luca = add_account(db_session, "Luca", "Bianchi", Role.PLAYER)
+        sign_in(client, anna)
+        invite = client.post("/auth/invites", json={"player_id": luca.player_id}, headers=WRITE_HEADER)
+        token = invite.json()["path"].rsplit("/", 1)[1]
+        assert put_role(client, luca.id, "admin") == 200
+        password_hash = luca.password_hash
+
+        response = TestClient(client.app).post(
+            f"/auth/invites/{token}/accept",
+            json={"email": luca.email, "password": "calcetto del martedi"},
+            headers=WRITE_HEADER,
+        )
+
+        assert response.status_code == 404
+        assert luca.password_hash == password_hash
+        assert luca.role == Role.ADMIN
