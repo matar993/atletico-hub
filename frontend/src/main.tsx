@@ -25,6 +25,8 @@ api.use(
       void router.navigate({ to: '/login', search: { redirect: router.state.location.href } })
     },
     () => {
+      // The role may have changed: reload it, so the menu and /users stop offering what the user lost.
+      void queryClient.invalidateQueries({ queryKey: CURRENT_USER_KEY })
       void router.navigate({ to: '/forbidden' })
     },
   ),
