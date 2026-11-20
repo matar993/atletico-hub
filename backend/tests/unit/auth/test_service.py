@@ -529,3 +529,41 @@ class TestAuthService:
         service.complete_invite(token=token, password="new-password", email=None)
 
         service.login(email="anna@example.com", password="new-password")
+
+    def test_create_admin_stores_an_admin_account_and_commits(self) -> None:
+        store = FakeAuthStore()
+        transaction = FakeTransaction()
+        service = AuthService(store=store, hasher=FakeHasher(), clock=FakeClock(START), transaction=transaction)
+        player = Player(id=1, first_name="Anna", last_name="Rossi")
+
+        account = service.create_admin(player=player, email=" Anna@Example.com ", password="secret-pass")
+
+        assert store.accounts == [account]
+        assert account.role == Role.ADMIN
+        assert account.email == "anna@example.com"
+        assert account.password_hash == "hashed:secret-pass"
+        assert transaction.commits == 1
+
+    def test_create_admin_refuses_an_email_in_use(self) -> None:
+        store = FakeAuthStore()
+        store.accounts.append(
+            Account(
+                player=Player(id=1, first_name="Anna", last_name="Rossi"),
+                email="anna@example.com",
+                password_hash="hashed:secret-pass",
+                role=Role.PLAYER,
+                failed_logins=0,
+            )
+        )
+        transaction = FakeTransaction()
+        service = AuthService(store=store, hasher=FakeHasher(), clock=FakeClock(START), transaction=transaction)
+
+        with pytest.raises(EmailInUseError):
+            service.create_admin(
+                player=Player(id=2, first_name="Luca", last_name="Bianchi"),
+                email="anna@example.com",
+                password="secret-pass",
+            )
+
+        assert len(store.accounts) == 1
+        assert transaction.commits == 0

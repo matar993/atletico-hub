@@ -168,6 +168,12 @@ class AuthService:
         self._transaction.commit()
         return account, session_token
 
+    def create_admin(self, player: Player, email: str, password: str) -> Account:
+        self._check_password(password)
+        account = self._create_account(player, email, password, Role.ADMIN)
+        self._transaction.commit()
+        return account
+
     def _valid_invite(self, token: str) -> Invite:
         invite = self._store.invite_by_token_hash(hash_token(token))
         if invite is None or invite.used_at is not None or invite.expires_at <= self._clock.now():
