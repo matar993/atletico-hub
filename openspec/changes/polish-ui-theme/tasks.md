@@ -1,6 +1,6 @@
 ## 1. Dependencies and tokens
 
-- [ ] 1.1 Add `framer-motion`, `@radix-ui/react-dialog`, `@radix-ui/react-dropdown-menu`, `@fontsource/inter`, `@fontsource/jetbrains-mono`, `tailwind-merge`, `clsx` to `frontend/package.json` and update the lock file (`docker compose exec ui npm install ...`); verify `make ui-build` passes and note the bundle size
+- [x] 1.1 Add `framer-motion`, `@radix-ui/react-dialog`, `@radix-ui/react-dropdown-menu`, `@fontsource/inter`, `@fontsource/jetbrains-mono`, `tailwind-merge`, `clsx` to `frontend/package.json` and update the lock file (`docker compose exec ui npm install ...`); verify `make ui-build` passes and note the bundle size
 - [ ] 1.2 Add `src/lib/cn.ts` with `cn.test.ts` (merges conflicting Tailwind classes, drops falsy values); verify `make ui-test` passes
 - [ ] 1.3 Define OKLCH tokens (light and `.dark`), `@theme inline` mapping, base styles and font imports in `src/styles/globals.css` and `src/main.tsx`; verify `make ui-build` passes and the built CSS and fonts load from `'self'` in `npm run dev`
 - [ ] 1.4 Check the contrast of every foreground/background token pair in both themes is at least 4.5:1; record the pairs and ratios in the developer guide token section; verify by script output in the task commit message
