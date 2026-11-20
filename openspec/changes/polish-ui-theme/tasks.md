@@ -20,7 +20,7 @@
 ## 4. Pages
 
 - [x] 4.1 Add `Page` and `EmptyState` in `src/layout/` with tests (one `h1`, eyebrow, description, actions, empty state text); rewrite `PlaceholderPage` on them keeping its props; verify the existing `PlaceholderPage.test.tsx` passes unchanged
-- [ ] 4.2 Add `Panel` and the sample content constant in `src/home/`; rebuild `HomePage` with three panels, `Anteprima` badges and links to sections; update `HomePage.test.tsx` (three panels, badges, link targets); verify `make ui-test` passes
+- [x] 4.2 Add `Panel` and the sample content constant in `src/home/`; rebuild `HomePage` with three panels, `Anteprima` badges and links to sections; update `HomePage.test.tsx` (three panels, badges, link targets); verify `make ui-test` passes
 
 ## 5. Browser tests
 
