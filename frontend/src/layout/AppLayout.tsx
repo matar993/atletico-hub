@@ -1,8 +1,11 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { Outlet } from '@tanstack/react-router'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Outlet, useRouter } from '@tanstack/react-router'
 import { AnimatePresence, MotionConfig, motion } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { LogOut, Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { currentUserQuery } from '@/auth/currentUser'
+import { api } from '@/lib/api/client'
 import { ThemeMenu } from '@/theme/ThemeMenu'
 import { NavMenu } from './NavMenu'
 import { TEAM_NAME } from './navigation'
@@ -17,6 +20,16 @@ const ICON_BUTTON =
 
 export function AppLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const router = useRouter()
+  const queryClient = useQueryClient()
+  const { data: user } = useQuery(currentUserQuery)
+
+  async function logout() {
+    await api.POST('/auth/logout')
+    // Drop every cached answer, so the next user of this browser never sees this user's data.
+    queryClient.clear()
+    await router.navigate({ to: '/login', search: { redirect: undefined } })
+  }
 
   // reducedMotion="user": with prefers-reduced-motion the slide (a transform) is off and only the fade stays.
   return (
@@ -34,8 +47,16 @@ export function AppLayout() {
               {BRAND_MARK}
             </span>
             <span className="text-lg font-semibold tracking-tight">{TEAM_NAME}</span>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-2">
+              {user && (
+                <span className="hidden text-sm font-medium sm:inline">
+                  {user.first_name} {user.last_name}
+                </span>
+              )}
               <ThemeMenu />
+              <button type="button" aria-label="Esci" onClick={logout} className={ICON_BUTTON}>
+                <LogOut aria-hidden="true" className="size-5" />
+              </button>
             </div>
           </header>
 
