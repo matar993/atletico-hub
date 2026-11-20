@@ -1,1 +1,77 @@
 @import 'tailwindcss';
+
+/* Design tokens. Every color of the app comes from here: components use the Tailwind names mapped below, never raw
+   colors. Palette is a default until the official club colors are given. */
+:root {
+  --background: oklch(0.985 0.003 255);
+  --surface: oklch(1 0 0);
+  --surface-raised: oklch(0.965 0.006 255);
+  --foreground: oklch(0.21 0.02 255);
+  --muted-foreground: oklch(0.45 0.02 255);
+  --border: oklch(0.9 0.008 255);
+  --primary: oklch(0.5 0.2 27);
+  --primary-foreground: oklch(0.99 0 0);
+  --accent: oklch(0.94 0.025 27);
+  --accent-foreground: oklch(0.38 0.15 27);
+  --ring: oklch(0.55 0.2 27);
+  --success: oklch(0.45 0.12 150);
+  --warning: oklch(0.5 0.12 70);
+  --danger: oklch(0.5 0.2 25);
+  --radius: 0.75rem;
+  --shadow-soft: 0 1px 2px oklch(0.2 0.02 255 / 0.06), 0 4px 16px oklch(0.2 0.02 255 / 0.06);
+  color-scheme: light;
+}
+
+.dark {
+  --background: oklch(0.17 0.015 255);
+  --surface: oklch(0.21 0.017 255);
+  --surface-raised: oklch(0.26 0.02 255);
+  --foreground: oklch(0.96 0.005 255);
+  --muted-foreground: oklch(0.74 0.015 255);
+  --border: oklch(0.32 0.02 255);
+  --primary: oklch(0.66 0.19 27);
+  --primary-foreground: oklch(0.15 0.02 255);
+  --accent: oklch(0.3 0.07 27);
+  --accent-foreground: oklch(0.92 0.05 27);
+  --ring: oklch(0.7 0.19 27);
+  --success: oklch(0.78 0.15 150);
+  --warning: oklch(0.82 0.14 80);
+  --danger: oklch(0.74 0.17 25);
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.3), 0 4px 16px oklch(0 0 0 / 0.3);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --shadow-soft: var(--shadow-soft);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    background-color: var(--background);
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+}
