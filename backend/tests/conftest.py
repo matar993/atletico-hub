@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from atletico_hub.db.settings import DatabaseSettings
 
-ALEMBIC_INI = Path(__file__).parents[2] / "alembic.ini"
+ALEMBIC_INI = Path(__file__).parents[1] / "alembic.ini"
 
 
 # One database per test run and xdist worker, migrated once: parallel workers, and runs from other worktrees

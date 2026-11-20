@@ -102,7 +102,7 @@ docker compose run --rm -e MIGRATE_DB=false api pytest tests -k "health" -v
 
 Test layout and rules: [CODE_GUIDELINES.md](../../../../CODE_GUIDELINES.md#tests).
 
-Integration tests get the fixtures of `backend/tests/integration/conftest.py`: `db_engine`, a database of their own per test run and worker (`<DB_DATABASE>_test_<run>_<worker>`), migrated once and dropped at the end, and `db_session`, a session whose changes are rolled back after each test. Two runs on the shared stack do not collide. A run killed before its end leaves its databases; with no test run in progress, this drops them and keeps the dev data:
+Integration and system tests get the fixtures of `backend/tests/conftest.py`: `db_engine`, a database of their own per test run and worker (`<DB_DATABASE>_test_<run>_<worker>`), migrated once and dropped at the end, and `db_session`, a session whose changes are rolled back after each test. Two runs on the shared stack do not collide. A run killed before its end leaves its databases; with no test run in progress, this drops them and keeps the dev data:
 
 ```bash
 docker compose exec -T db psql -U atletico -d atletico -Atc \
