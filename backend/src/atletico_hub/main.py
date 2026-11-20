@@ -5,6 +5,7 @@ from atletico_hub.auth.router import router as auth_router
 from atletico_hub.players.profile_router import router as profile_router
 from atletico_hub.players.router import router as players_router
 from atletico_hub.settings import ApiSettings
+from atletico_hub.users.router import router as users_router
 
 
 def create_app(settings: ApiSettings) -> FastAPI:
@@ -19,6 +20,7 @@ def create_app(settings: ApiSettings) -> FastAPI:
     app.include_router(auth_router)
     app.include_router(players_router)
     app.include_router(profile_router)
+    app.include_router(users_router)
 
     @app.get("/health")
     def health() -> dict[str, str]:

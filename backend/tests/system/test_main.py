@@ -45,6 +45,8 @@ ROLE_TABLE = {
     ("PATCH", "/players/{player_id}"): (401, 403, 422),
     ("PATCH", "/profile"): (401, 422, 422),
     ("POST", "/auth/invites"): (401, 403, 422),
+    ("GET", "/users"): (401, 403, 200),
+    ("PUT", "/users/{account_id}/role"): (401, 403, 422),
 }
 
 
@@ -162,7 +164,7 @@ class TestRoleTable:
     ) -> None:
         clients = (client, signed_in_client(db_session, Role.PLAYER), signed_in_client(db_session, Role.ADMIN))
 
-        url = path.replace("{player_id}", "1")
+        url = path.replace("{player_id}", "1").replace("{account_id}", "1")
         answers = tuple(
             c.request(method, url, headers=WRITE_HEADER, json={} if method in WRITE_METHODS else None).status_code
             for c in clients

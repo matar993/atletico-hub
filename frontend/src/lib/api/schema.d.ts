@@ -158,6 +158,40 @@ export interface paths {
         patch: operations["update_profile_profile_patch"];
         trace?: never;
     };
+    "/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Users */
+        get: operations["list_users_users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{account_id}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change Role */
+        put: operations["change_role_users__account_id__role_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -186,12 +220,45 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** AccountPermissions */
+        AccountPermissions: {
+            /** Change Role */
+            change_role: boolean;
+        };
+        /** AccountRole */
+        AccountRole: {
+            /** Id */
+            id: number;
+            role: components["schemas"]["Role"];
+        };
+        /** AccountSummary */
+        AccountSummary: {
+            /** Id */
+            id: number;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
+            /** Email */
+            email: string;
+            role: components["schemas"]["Role"];
+            permissions: components["schemas"]["AccountPermissions"];
+        };
+        /** Accounts */
+        Accounts: {
+            /** Items */
+            items: components["schemas"]["AccountSummary"][];
+        };
         /** AddPlayerRequest */
         AddPlayerRequest: {
             /** First Name */
             first_name: string;
             /** Last Name */
             last_name: string;
+        };
+        /** ChangeRoleRequest */
+        ChangeRoleRequest: {
+            role: components["schemas"]["Role"];
         };
         /** CreateInviteRequest */
         CreateInviteRequest: {
@@ -601,6 +668,61 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CurrentUser"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_users_users_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Accounts"];
+                };
+            };
+        };
+    };
+    change_role_users__account_id__role_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                account_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeRoleRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountRole"];
                 };
             };
             /** @description Validation Error */
