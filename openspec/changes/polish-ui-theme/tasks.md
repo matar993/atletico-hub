@@ -14,7 +14,7 @@
 ## 3. Shell
 
 - [x] 3.1 Restyle `NavMenu` with tokens and the animated active marker (`framer-motion`, `layoutId` per container, reduced motion respected); verify the existing `NavMenu.test.tsx` passes unchanged
-- [ ] 3.2 Rebuild `AppLayout`: sticky header with brand mark, team name and `ThemeMenu`; restyled fixed sidebar; Radix Dialog drawer with slide animation; keep names `Menu principale`, `Apri il menu`, `Chiudi il menu`; verify the existing `AppLayout.test.tsx` and `e2e/navigation.spec.ts` pass unchanged
+- [x] 3.2 Rebuild `AppLayout`: sticky header with brand mark, team name and `ThemeMenu`; restyled fixed sidebar; Radix Dialog drawer with slide animation; keep names `Menu principale`, `Apri il menu`, `Chiudi il menu`; verify the existing `AppLayout.test.tsx` and `e2e/navigation.spec.ts` pass unchanged
 - [ ] 3.3 Add unit tests for the drawer in jsdom: open, choose entry closes it, Escape closes it, close button closes it, hamburger `aria-expanded`; verify `make ui-test` passes
 
 ## 4. Pages
