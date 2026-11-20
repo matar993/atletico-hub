@@ -53,18 +53,6 @@ Decisions that span the whole project are recorded as ADRs in `docs/documents/ar
 
 ---
 
-## Delegation to subagents
-
-The rules (agent, one task per subagent, async, one writer per checkout) are in [AGENTS.md](AGENTS.md#9-delegation-and-git-protocol). The handoff to an `implementer` holds:
-
-- the text of the task, copied from `tasks.md`;
-- the files to read: the change artifacts and the code the task touches;
-- the test layout of [CODE_GUIDELINES.md](CODE_GUIDELINES.md#tests);
-- the commands to run and report, from the [Definition of Done](#definition-of-done);
-- the report format of the [`implementer`](.agents/agents/implementer.md) agent: changed files, tasks completed, validation results, deviations, risks.
-
-The main agent reviews each result before it launches the next task.
-
 ## Definition of Done
 
 - Before every commit on backend code, run `make lint-fix`, `make autoformat` and `make typecheck`, and fix every failure.
@@ -91,5 +79,5 @@ The rules above hold at merge time. Do these steps in order. The agent merges on
 8. Review the final diff with the [`code-review`](.agents/skills/code-review/SKILL.md) skill.
 9. Write the squash commit message (see [Git workflow](#git-workflow)).
 10. Get the user's review of the pull request and the authorization to merge.
-11. Check that the CI workflow ran on the latest commit. An `implementer` subagent monitors it (`gh pr checks <pr> --watch`) and reports when it ends.
+11. Check that the CI workflow ran on the latest commit. Watch it in the background (`gh pr checks <pr> --watch`) until it ends.
 12. Merge with the command of the [`gh`](.agents/skills/gh/SKILL.md#ready-update-and-merge) skill.
