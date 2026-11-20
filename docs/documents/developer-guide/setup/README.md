@@ -47,6 +47,16 @@ make logs   # follow the logs
 make down   # stop everything; the volumes are kept
 ```
 
+### Create the first admin
+
+Every API route needs a session, so a new database has no way in. Create the first admin once, with the stack up:
+
+```bash
+make create-admin   # asks for first name, last name, email and password
+```
+
+The command refuses an email already in use and a password outside 8 to 128 characters. The admin then signs in on the web app and adds players and invite links.
+
 ### Notes
 
 - Edits to `backend/src/atletico_hub/` reload the API without a rebuild. Edits to `frontend/` reload the web app.
@@ -54,6 +64,7 @@ make down   # stop everything; the volumes are kept
 - The `api` container applies the database migrations before it starts (`MIGRATE_DB=true` in `compose.yaml`). A failed migration stops the container: read it with `docker compose logs api`.
 - To start from an empty database, run `docker compose down -v`: it also deletes the volumes.
 - `example.env` lists the variables you can set.
+- `AUTH_COOKIE_SECURE` sets the `Secure` flag of the session cookie. It defaults to `true`. `compose.yaml` sets it to `false`, because the local stack runs on plain HTTP and Safari drops `Secure` cookies there. Keep it `true` on any deploy behind HTTPS.
 - When the web app does not reload on file changes, set `VITE_POLLING=1` in `.env`.
 
 ## Technology stack
@@ -73,6 +84,7 @@ make down   # stop everything; the volumes are kept
 | backend format | `make autoformat` | ruff format |
 | backend types | `make typecheck` | ty check |
 | backend layers | `make lint-imports` | import-linter layer contracts ([ADR-0006](../../architecture/adr/0006-layered-feature-packages-in-the-api.md)) |
+| first admin | `make create-admin` | Create the first admin account ([details](#create-the-first-admin)) |
 | lock | `make lock` | Regenerate `backend/uv.lock` ([details](#backend-dependencies)) |
 | specs | `make validate` | `openspec validate --all --strict` |
 | web app checks | `make ui-checks` | Type check, lint, format check, unit tests and build |

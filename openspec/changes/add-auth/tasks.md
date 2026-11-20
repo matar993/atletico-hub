@@ -30,7 +30,7 @@
 ## 5. First admin
 
 - [x] 5.1 Add `atletico_hub/auth/cli.py` and the `make create-admin` target, as in design D9; verify with a unit test that it refuses an email in use, and by hand that the created admin logs in through `POST /auth/login`
-- [ ] 5.2 Document `make create-admin` and `AUTH_COOKIE_SECURE` in `docs/documents/developer-guide/setup/README.md`; verify the documented command runs as written
+- [x] 5.2 Document `make create-admin` and `AUTH_COOKIE_SECURE` in `docs/documents/developer-guide/setup/README.md`; verify the documented command runs as written
 
 ## 6. Web app: session and guard
 
