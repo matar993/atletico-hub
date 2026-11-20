@@ -58,7 +58,7 @@
 
 ## 10. Integration check
 
-- [ ] 10.1 Run `make test`, `make lint`, `make typecheck`, `make lint-imports`, `make ui-checks`, `make ui-e2e` and `make validate` on the final tree; verify all pass, then walk the flow by hand on the stack: promote a player from Utenti, try to demote the last admin, rename oneself on Profilo as a player, rename a player from Rosa as an admin, open `/users` as a player, reset an admin with `make reset-password`
+- [x] 10.1 Run `make test`, `make lint`, `make typecheck`, `make lint-imports`, `make ui-checks`, `make ui-e2e` and `make validate` on the final tree; verify all pass, then walk the flow by hand on the stack: promote a player from Utenti, try to demote the last admin, rename oneself on Profilo as a player, rename a player from Rosa as an admin, open `/users` as a player, reset an admin with `make reset-password`
 
 ## Workflow follow-up
 
