@@ -12,8 +12,11 @@ function isOpenRoute(schemaPath: string) {
   return schemaPath === '/auth/login' || schemaPath === '/auth/me' || schemaPath.startsWith('/auth/invites/')
 }
 
-/** Adds the CSRF header to every write, and calls `onUnauthorized` on a 401 from any route that needs a session. */
-export function createAuthMiddleware(onUnauthorized: () => void): Middleware {
+/**
+ * Adds the CSRF header to every write, calls `onUnauthorized` on a 401 from any route that needs a session and
+ * `onForbidden` on a 403 from any route.
+ */
+export function createAuthMiddleware(onUnauthorized: () => void, onForbidden: () => void = () => {}): Middleware {
   return {
     onRequest({ request }) {
       if (WRITE_METHODS.has(request.method)) {
@@ -24,6 +27,9 @@ export function createAuthMiddleware(onUnauthorized: () => void): Middleware {
     onResponse({ response, schemaPath }) {
       if (response.status === 401 && !isOpenRoute(schemaPath)) {
         onUnauthorized()
+      }
+      if (response.status === 403) {
+        onForbidden()
       }
       return response
     },

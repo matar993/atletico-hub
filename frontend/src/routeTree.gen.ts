@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedCallUpsRouteImport } from './routes/_authenticated/call-ups'
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedForbiddenRouteImport } from './routes/_authenticated/forbidden'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedSquadRouteImport } from './routes/_authenticated/squad'
@@ -42,6 +43,11 @@ const AuthenticatedCallUpsRoute = AuthenticatedCallUpsRouteImport.update({
 const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedForbiddenRoute = AuthenticatedForbiddenRouteImport.update({
+  id: '/forbidden',
+  path: '/forbidden',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedNotificationsRoute =
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/call-ups': typeof AuthenticatedCallUpsRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/forbidden': typeof AuthenticatedForbiddenRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/squad': typeof AuthenticatedSquadRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/call-ups': typeof AuthenticatedCallUpsRoute
   '/events': typeof AuthenticatedEventsRoute
+  '/forbidden': typeof AuthenticatedForbiddenRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/squad': typeof AuthenticatedSquadRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/call-ups': typeof AuthenticatedCallUpsRoute
   '/_authenticated/events': typeof AuthenticatedEventsRoute
+  '/_authenticated/forbidden': typeof AuthenticatedForbiddenRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/squad': typeof AuthenticatedSquadRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/call-ups'
     | '/events'
+    | '/forbidden'
     | '/notifications'
     | '/profile'
     | '/squad'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/call-ups'
     | '/events'
+    | '/forbidden'
     | '/notifications'
     | '/profile'
     | '/squad'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/call-ups'
     | '/_authenticated/events'
+    | '/_authenticated/forbidden'
     | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/_authenticated/squad'
@@ -186,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEventsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/forbidden': {
+      id: '/_authenticated/forbidden'
+      path: '/forbidden'
+      fullPath: '/forbidden'
+      preLoaderRoute: typeof AuthenticatedForbiddenRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/notifications': {
       id: '/_authenticated/notifications'
       path: '/notifications'
@@ -227,6 +246,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedCallUpsRoute: typeof AuthenticatedCallUpsRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
+  AuthenticatedForbiddenRoute: typeof AuthenticatedForbiddenRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSquadRoute: typeof AuthenticatedSquadRoute
@@ -237,6 +257,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCallUpsRoute: AuthenticatedCallUpsRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRoute,
+  AuthenticatedForbiddenRoute: AuthenticatedForbiddenRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSquadRoute: AuthenticatedSquadRoute,

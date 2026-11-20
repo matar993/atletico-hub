@@ -17,11 +17,17 @@ const queryClient = new QueryClient()
 const router = createRouter({ routeTree, context: { queryClient } })
 
 // A 401 from any route that needs a session: forget the user and go to login, then back to this page.
+// A 403 from any route: the user may have lost a permission during the session, so show the not authorized page.
 api.use(
-  createAuthMiddleware(() => {
-    queryClient.removeQueries({ queryKey: CURRENT_USER_KEY })
-    void router.navigate({ to: '/login', search: { redirect: router.state.location.href } })
-  }),
+  createAuthMiddleware(
+    () => {
+      queryClient.removeQueries({ queryKey: CURRENT_USER_KEY })
+      void router.navigate({ to: '/login', search: { redirect: router.state.location.href } })
+    },
+    () => {
+      void router.navigate({ to: '/forbidden' })
+    },
+  ),
 )
 
 declare module '@tanstack/react-router' {
