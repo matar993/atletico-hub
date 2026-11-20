@@ -64,7 +64,7 @@ ui-build:
 # Everything the workflow's ui-checks job runs.
 ui-checks: ui-typecheck ui-lint ui-format-check ui-test ui-build
 
-# Browser tests (Playwright). Need no stack, but Node 22 and a browser on the host.
+# Browser tests (Playwright). Need no stack, but Node 26 and a browser on the host.
 ui-e2e:
 	cd frontend && npm ci && npx playwright install chromium && npm run test:e2e
 
