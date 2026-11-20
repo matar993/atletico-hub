@@ -12,7 +12,7 @@
 
 ## 3. Layout and navigation
 
-- [ ] 3.1 Add `src/layout/navigation.ts` (team name constant, ordered entries `{ label, to, icon }` typed on the router paths) and `NavMenu.tsx` (router `Link`, active highlight, `exact` on Home) with `NavMenu.test.tsx` on a memory-history router: six entries in order, only the current one with `aria-current="page"`; verify `make ui-test` passes
+- [x] 3.1 Add `src/layout/navigation.ts` (team name constant, ordered entries `{ label, to, icon }` typed on the router paths) and `NavMenu.tsx` (router `Link`, active highlight, `exact` on Home) with `NavMenu.test.tsx` on a memory-history router: six entries in order, only the current one with `aria-current="page"`; verify `make ui-test` passes
 - [ ] 3.2 Add `src/layout/AppLayout.tsx` (header with team name, `md:` fixed sidebar, hamburger button and `<dialog>` drawer below `md`, content area with `<Outlet />`) and render it from `src/routes/__root.tsx`; add `AppLayout.test.tsx` for the team name and the routed content; verify `make ui-test` passes
 - [ ] 3.3 Set `lang="it"` in `frontend/index.html`; verify the built `dist/index.html` carries it after `make ui-build`
 
