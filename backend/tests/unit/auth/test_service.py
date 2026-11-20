@@ -7,6 +7,7 @@ from atletico_hub.auth.service import (
     DUMMY_PASSWORD_HASH,
     INVITE_DURATION,
     AccountLockedError,
+    AccountNotFoundError,
     AdminAccountError,
     AuthService,
     EmailInUseError,
@@ -586,4 +587,54 @@ class TestAuthService:
             )
 
         assert len(store.accounts) == 1
+        assert transaction.commits == 0
+
+
+class TestResetPassword:
+    @staticmethod
+    def admin_with_a_session() -> tuple[AuthService, FakeAuthStore, FakeTransaction, Account]:
+        store = FakeAuthStore()
+        account = Account(
+            id=1,
+            player=Player(id=1, first_name="Anna", last_name="Rossi"),
+            email="anna@example.com",
+            password_hash="hashed:old-password",
+            role=Role.ADMIN,
+            failed_logins=3,
+            locked_until=START + timedelta(minutes=5),
+        )
+        store.accounts.append(account)
+        store.sessions.append(Session(account=account, token_hash="t", last_used_at=START, created_at=START))
+        transaction = FakeTransaction()
+        service = AuthService(store=store, hasher=FakeHasher(), clock=FakeClock(START), transaction=transaction)
+        return service, store, transaction, account
+
+    def test_sets_the_new_password_ends_the_sessions_clears_the_lockout_and_commits(self) -> None:
+        service, store, transaction, account = self.admin_with_a_session()
+
+        service.reset_password(" Anna@Example.com ", "new-password")
+
+        assert account.password_hash == "hashed:new-password"
+        assert (account.failed_logins, account.locked_until) == (0, None)
+        assert store.sessions == []
+        assert transaction.commits == 1
+
+    def test_refuses_an_unknown_email_and_changes_nothing(self) -> None:
+        service, store, transaction, account = self.admin_with_a_session()
+
+        with pytest.raises(AccountNotFoundError):
+            service.reset_password("nobody@example.com", "new-password")
+
+        assert account.password_hash == "hashed:old-password"
+        assert len(store.sessions) == 1
+        assert transaction.commits == 0
+
+    def test_refuses_a_password_of_7_characters_and_changes_nothing(self) -> None:
+        service, store, transaction, account = self.admin_with_a_session()
+
+        with pytest.raises(InvalidPasswordError):
+            service.reset_password("anna@example.com", "1234567")
+
+        assert account.password_hash == "hashed:old-password"
+        assert len(store.sessions) == 1
         assert transaction.commits == 0

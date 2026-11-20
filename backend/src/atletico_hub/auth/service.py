@@ -42,6 +42,10 @@ class AdminAccountError(Exception):
     pass
 
 
+class AccountNotFoundError(Exception):
+    pass
+
+
 class EmailInUseError(Exception):
     pass
 
@@ -178,6 +182,15 @@ class AuthService:
     def create_admin(self, player: Player, email: str, password: str) -> Account:
         self._check_password(password)
         account = self._create_account(player, email, password, Role.ADMIN)
+        self._transaction.commit()
+        return account
+
+    def reset_password(self, email: str, password: str) -> Account:
+        account = self._store.account_by_email(email.strip().lower())
+        if account is None:
+            raise AccountNotFoundError(f"No account with email {email.strip().lower()}")
+        self._check_password(password)
+        self._reset_password(account, password)
         self._transaction.commit()
         return account
 
