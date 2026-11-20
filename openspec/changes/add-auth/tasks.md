@@ -36,7 +36,7 @@
 
 - [x] 6.1 Regenerate `src/lib/api/schema.d.ts` (`make ui-gen-api`); verify `make ui-typecheck` passes
 - [x] 6.2 Add the client middleware of design D11 (CSRF header on writes, 401 to login) with a unit test of each branch; verify `make ui-test` passes
-- [ ] 6.3 Move the section routes under `src/routes/_authenticated/` with a `beforeLoad` guard, render `AppLayout` there and the theme provider in `__root.tsx`, and pass the `QueryClient` in the router context; verify with unit tests that a 401 on the current user redirects to `/login` with the `redirect` search value and that the paths of the sections do not change
+- [x] 6.3 Move the section routes under `src/routes/_authenticated/` with a `beforeLoad` guard, render `AppLayout` there and the theme provider in `__root.tsx`, and pass the `QueryClient` in the router context; verify with unit tests that a 401 on the current user redirects to `/login` with the `redirect` search value and that the paths of the sections do not change
 - [ ] 6.4 Add the login page at `/login`, with the safe `redirect` rule of design D10; verify with unit tests: failed login shows the API message, success opens the requested section, an external `redirect` opens Home
 - [ ] 6.5 Show the user's name and a logout button in the header of `AppLayout`; verify with a unit test that logout calls the API and opens the login page
 

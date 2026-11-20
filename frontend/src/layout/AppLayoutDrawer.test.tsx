@@ -1,15 +1,12 @@
-import { RouterProvider, createMemoryHistory, createRouter } from '@tanstack/react-router'
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
-import { routeTree } from '@/routeTree.gen'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { api } from '@/lib/api/client'
+import { renderApp } from '@/test/renderApp'
+
+vi.mock('@/lib/api/client', () => ({ api: { GET: vi.fn(), POST: vi.fn() } }))
 
 async function renderAt(path: string) {
-  const router = createRouter({
-    routeTree,
-    history: createMemoryHistory({ initialEntries: [path] }),
-  })
-  await router.load()
-  render(<RouterProvider router={router} />)
+  const { router } = await renderApp(path)
   return router
 }
 
@@ -21,6 +18,13 @@ async function openDrawer() {
 }
 
 describe('AppLayout drawer', () => {
+  beforeEach(() => {
+    vi.mocked(api.GET).mockResolvedValue({
+      data: { first_name: 'Anna', last_name: 'Rossi', email: 'anna@example.com', role: 'player' },
+      response: new Response(null, { status: 200 }),
+    } as never)
+  })
+
   it('is closed at first and the hamburger button says so', async () => {
     await renderAt('/')
 
