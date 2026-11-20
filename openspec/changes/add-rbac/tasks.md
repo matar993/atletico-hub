@@ -5,7 +5,7 @@
 - [x] 1.1 Add `auth/permissions.py` as in design D1 (`Permission`, `ROLE_PERMISSIONS`, `can`); verify unit tests cover the set of each role
 - [x] 1.2 Add `require(permission)` to `auth/dependencies.py` (design D2), move `POST /players` to `squad:create`, `POST /auth/invites` to `invites:create`, `GET /players` to `squad:view`, and remove `require_admin`; verify the existing system tests pass and a new one shows a player sending an invalid body to `POST /players` gets 403, not 422
 - [x] 1.3 Rewrite the route walk in `tests/system/test_main.py` as in design D9 (`OPEN_ROUTES`, `SIGNED_IN_ROUTES`, `require` declaration) and add the route × role table test with one account per role; verify both pass, and fail on a route mounted without a declaration or without a table row
-- [ ] 1.4 Run `make lint`, `make typecheck` and `make lint-imports`; verify all three pass
+- [x] 1.4 Run `make lint`, `make typecheck` and `make lint-imports`; verify all three pass
 
 ## 2. Strict bodies and API documentation
 
