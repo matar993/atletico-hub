@@ -22,7 +22,7 @@
 
 ## 5. Documentation
 
-- [ ] 5.1 Add the user guide page for the navigation (sections, sidebar on desktop, drawer on phone) under `docs/documents/user-guide/` and list it in its index; update "Today" in `ARCHITECTURE.md` (layout and placeholder sections); verify every link resolves and `make validate` passes
+- [x] 5.1 Add the user guide page for the navigation (sections, sidebar on desktop, drawer on phone) under `docs/documents/user-guide/` and list it in its index; update "Today" in `ARCHITECTURE.md` (layout and placeholder sections); verify every link resolves and `make validate` passes
 
 ## 6. Integration check
 
