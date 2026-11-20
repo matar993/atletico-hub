@@ -1,6 +1,8 @@
+import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { useId } from 'react'
+import { currentUserQuery } from '@/auth/currentUser'
 import { NAV_ENTRIES } from './navigation'
 
 type NavMenuProps = {
@@ -10,11 +12,13 @@ type NavMenuProps = {
 export function NavMenu({ onNavigate }: NavMenuProps) {
   // The sidebar and the drawer both render this menu: each needs its own marker, or the two would animate as one.
   const markerId = useId()
+  const { data: user } = useQuery(currentUserQuery)
+  const entries = NAV_ENTRIES.filter((entry) => !entry.adminOnly || user?.role === 'admin')
 
   return (
     <nav aria-label="Menu principale">
       <ul className="space-y-1">
-        {NAV_ENTRIES.map(({ label, to, icon: Icon }) => (
+        {entries.map(({ label, to, icon: Icon }) => (
           <li key={to}>
             <Link
               to={to}

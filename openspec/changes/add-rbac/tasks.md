@@ -47,7 +47,7 @@
 
 ## 8. Web app: Utenti and not authorized
 
-- [ ] 8.1 Add `adminOnly` to the Utenti entry in `layout/navigation.ts` and hide it in `NavMenu` for non-admins; verify unit tests for both roles
+- [x] 8.1 Add `adminOnly` to the Utenti entry in `layout/navigation.ts` and hide it in `NavMenu` for non-admins; verify unit tests for both roles
 - [ ] 8.2 Add `NotAuthorizedPage` and show it for a non-admin on `/users`, and on a 403 from any call; verify unit tests that the page makes no API call for a player
 - [ ] 8.3 Add the Utenti page in `src/users/` with the role select and the 409 message; verify unit tests for the list, a role change and the last-admin refusal
 - [ ] 8.4 Add `e2e/users.spec.ts` with stubbed API answers: an admin changes a role, a player opening `/users` sees the not authorized page; verify `make ui-e2e` passes
