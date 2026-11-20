@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 
-app = FastAPI(title="Atletico Hub API")
+from atletico_hub.auth.dependencies import require_csrf_header
+
+app = FastAPI(title="Atletico Hub API", dependencies=[Depends(require_csrf_header)])
 
 
 @app.get("/health")
