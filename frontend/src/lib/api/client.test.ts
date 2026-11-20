@@ -58,6 +58,15 @@ describe('auth middleware', () => {
     expect(ok.onForbidden).not.toHaveBeenCalled()
   })
 
+  // A rule that refuses an action answers 409: the page shows its message, the user stays on it.
+  it('does not call onForbidden on a 409', async () => {
+    const { client, onForbidden } = setup(409)
+
+    await client.POST('/auth/invites', { body: { player_id: 1 } })
+
+    expect(onForbidden).not.toHaveBeenCalled()
+  })
+
   it.each([
     [
       'login',

@@ -163,6 +163,22 @@ describe('SquadPage', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
+    it('shows in the row why an invite link is refused, for a player promoted since the page loaded', async () => {
+      const detail = 'La password di un admin si reimposta solo da riga di comando'
+      vi.mocked(api.POST).mockResolvedValue({
+        error: { detail },
+        response: new Response(null, { status: 409 }),
+      } as never)
+      await renderApp('/squad')
+      await screen.findByText('Luca Bianchi')
+      const row = screen.getByText('Luca Bianchi').closest('li') as HTMLElement
+
+      fireEvent.click(within(row).getByRole('button', { name: "Crea link d'invito" }))
+
+      expect(await within(row).findByRole('alert')).toHaveTextContent(detail)
+      expect(screen.getByRole('heading', { name: 'Rosa' })).toBeInTheDocument()
+    })
+
     it('creates an invite link, shows it once with its warning and copies it', async () => {
       const writeText = vi.fn().mockResolvedValue(undefined)
       Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
