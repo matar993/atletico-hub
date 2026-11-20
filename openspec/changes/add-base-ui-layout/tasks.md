@@ -6,7 +6,7 @@
 
 ## 2. Section pages and routes
 
-- [ ] 2.1 Add `src/layout/PlaceholderPage.tsx` (heading, description line, empty state) with `PlaceholderPage.test.tsx`; verify `make ui-test` passes, querying by role and text
+- [x] 2.1 Add `src/layout/PlaceholderPage.tsx` (heading, description line, empty state) with `PlaceholderPage.test.tsx`; verify `make ui-test` passes, querying by role and text
 - [ ] 2.2 Rewrite `src/home/HomePage.tsx` on `PlaceholderPage` and add `EventsPage`, `CallUpsPage`, `SquadPage`, `NotificationsPage`, `ProfilePage` in their feature folders, with the Italian texts of the spec; update `HomePage.test.tsx` to the "Home" heading; verify `make ui-test` passes
 - [ ] 2.3 Add the thin route files `events.tsx`, `call-ups.tsx`, `squad.tsx`, `notifications.tsx`, `profile.tsx` in `src/routes/` and regenerate `routeTree.gen.ts`; verify `make ui-typecheck` passes and each path renders its page in `npm run dev`
 
