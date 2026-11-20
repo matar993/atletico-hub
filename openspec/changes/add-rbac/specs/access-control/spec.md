@@ -29,7 +29,7 @@ Every API route SHALL check a permission before it runs, except routes declared 
 - **THEN** the test suite fails and names the route
 
 ### Requirement: Order of errors
-The API SHALL check, in this order: the session (401), the permission (403), the request body (422). A user without the permission SHALL get 403 even when the body is invalid.
+The API SHALL check, in this order: the session (401), the permission (403), the request body against its schema (422). A user without the permission SHALL get 403 even when the body does not match the schema. A body that is not valid JSON gets 422 before any of these checks.
 
 #### Scenario: Player sends an invalid body to an admin route
 - **WHEN** a user with role `player` sends a body without `last_name` to add a player
