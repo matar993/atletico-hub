@@ -4,18 +4,18 @@ version = "0.0.0"
 requires-python = ">=3.14"
 dependencies = [
     "alembic>=1.16",
-    "fastapi>=0.120",
-    "psycopg[binary]>=3.2",
+    "fastapi>=0.163.1",
+    "psycopg[binary]>=3.3.9",
     "pydantic-settings>=2.10",
-    "sqlalchemy>=2.0",
-    "uvicorn[standard]>=0.38",
+    "sqlalchemy>=2.1.9",
+    "uvicorn[standard]>=0.54.0",
 ]
 
 [tool.uv]
 package = true
 
 [build-system]
-requires = ["uv_build>=0.8.13,<0.14"]
+requires = ["uv_build>=0.13.9,<0.14"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
@@ -62,8 +62,8 @@ dev = [
     "pytest>=9",
     "pytest-cov>=7",
     "pytest-xdist>=3.8",
-    "ruff>=0.14",
-    "ty>=0.0.1a20",
+    "ruff>=0.17.5",
+    "ty>=0.0.105",
 ]
 
 # Layer rules of ADR-0006, checked by `make lint-imports`. Each feature package
