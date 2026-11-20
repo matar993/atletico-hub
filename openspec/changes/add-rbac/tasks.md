@@ -36,7 +36,7 @@
 ## 6. Commands on the API host
 
 - [x] 6.1 Turn `auth/cli.py` into the `create-admin`, `promote` and `reset-password` subcommands and add `AuthService.reset_password` (design D8); verify unit or integration tests for each subcommand, including unknown email and short password
-- [ ] 6.2 Declare the `atletico-hub` console script in `backend/pyproject.toml`, run `make lock`, and point `make create-admin`, `make promote` and `make reset-password` at it; verify `docker compose exec api atletico-hub --help` lists the three subcommands and the `runtime` image runs `atletico-hub --help`
+- [x] 6.2 Declare the `atletico-hub` console script in `backend/pyproject.toml`, run `make lock`, and point `make create-admin`, `make promote` and `make reset-password` at it; verify `docker compose exec api atletico-hub --help` lists the three subcommands and the `runtime` image runs `atletico-hub --help`
 - [ ] 6.3 Document the command in `docs/documents/developer-guide/setup/README.md`, for the local stack (`make` targets) and for a deployed host (`docker exec -it <api-container> atletico-hub ...`); verify each runs as written on the stack: promote a player, reset an admin password, log in with it
 
 ## 7. Web app: Rosa

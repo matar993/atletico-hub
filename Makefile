@@ -1,6 +1,6 @@
 .PHONY: lock test lint typecheck lint-imports lint-fix autoformat \
 	ui-typecheck ui-lint ui-format ui-format-check ui-test ui-build ui-checks ui-e2e ui-gen-api \
-	create-admin validate hooks up down logs ps
+	create-admin promote reset-password validate hooks up down logs ps
 
 # ---- Backend ----
 
@@ -16,7 +16,15 @@ test:
 
 # Creates the first admin account. Asks for first name, last name, email and password. The stack must be up (`make up`).
 create-admin:
-	docker compose exec api python -m atletico_hub.auth.cli
+	docker compose exec api atletico-hub create-admin
+
+# Gives the admin role to the account with an email. Asks for the email. The stack must be up (`make up`).
+promote:
+	docker compose exec api atletico-hub promote
+
+# Sets a new password for the account with an email. Asks for the email and the password. The stack must be up (`make up`).
+reset-password:
+	docker compose exec api atletico-hub reset-password
 
 # Lints the backend with ruff from the uv environment of `backend/`. Fails on any finding.
 lint:
