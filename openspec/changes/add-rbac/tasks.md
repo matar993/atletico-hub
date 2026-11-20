@@ -15,7 +15,7 @@
 
 ## 3. Squad and profile: flags and name change
 
-- [ ] 3.1 Change `PlayerService.list_squad` to take the acting account and return the flags of design D4; verify unit tests on fakes for player and admin, including `create_invite` false on an admin account
+- [x] 3.1 Change `PlayerService.list_squad` to take the acting account and return the flags of design D4; verify unit tests on fakes for player and admin, including `create_invite` false on an admin account
 - [ ] 3.2 Add `PlayerService.rename(player_id, first_name, last_name)` (design D3); verify unit tests cover a valid rename, an unknown player and invalid names
 - [ ] 3.3 Change `GET /players` to the `Squad` shape and add `PATCH /players/{player_id}` (`players:update`), with rows in the role matrix; verify system tests for each scenario of the `squad` delta spec
 - [ ] 3.4 Add `PATCH /profile` (`profile:update`) in a profile router of the `players` package, wired in `create_app`, with rows in the role matrix; verify system tests for each API scenario of the `player-profile` delta spec, including 422 on a body with `role`

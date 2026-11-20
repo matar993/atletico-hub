@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from atletico_hub.auth.dependencies import require
 from atletico_hub.auth.models import Account
-from atletico_hub.auth.permissions import Permission, can
+from atletico_hub.auth.permissions import Permission
 from atletico_hub.db.session import get_session
 from atletico_hub.players.repository import PlayerRepository
 from atletico_hub.players.schemas import AddPlayerRequest, SquadMember
@@ -25,7 +25,7 @@ ServiceDep = Annotated[PlayerService, Depends(get_player_service)]
 def list_players(
     account: Annotated[Account, Depends(require(Permission.SQUAD_VIEW))], service: ServiceDep
 ) -> list[SquadMember]:
-    entries = service.list_squad(with_emails=can(account, Permission.SQUAD_VIEW_EMAIL))
+    entries = service.list_squad(account).entries
     return [
         SquadMember(
             id=entry.player.id,

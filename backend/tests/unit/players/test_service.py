@@ -2,12 +2,30 @@ from collections.abc import Sequence
 
 import pytest
 
+from atletico_hub.auth.models import Account, Role
 from atletico_hub.players.models import Player
 from atletico_hub.players.service import InvalidPlayerNameError, PlayerService
 
 
+def actor_with(role: Role) -> Account:
+    return Account(email="actor@example.com", password_hash="x", role=role)
+
+
+ROWS = [
+    (Player(first_name="Luca", last_name="Bianchi"), None),
+    (
+        Player(first_name="Anna", last_name="Rossi"),
+        Account(email="anna@example.com", password_hash="x", role=Role.PLAYER),
+    ),
+    (
+        Player(first_name="Boss", last_name="Verdi"),
+        Account(email="boss@example.com", password_hash="x", role=Role.ADMIN),
+    ),
+]
+
+
 class FakePlayerStore:
-    def __init__(self, rows: Sequence[tuple[Player, str | None]] = ()) -> None:
+    def __init__(self, rows: Sequence[tuple[Player, Account | None]] = ()) -> None:
         self.added: list[Player] = []
         self._rows = rows
 
@@ -15,7 +33,7 @@ class FakePlayerStore:
         self.added.append(player)
         return player
 
-    def list_with_email(self) -> Sequence[tuple[Player, str | None]]:
+    def list_with_account(self) -> Sequence[tuple[Player, Account | None]]:
         return self._rows
 
 
@@ -58,18 +76,26 @@ class TestPlayerService:
 
         assert len(player.first_name) == 50
 
-    def test_list_squad_gives_emails_only_when_asked(self) -> None:
-        rows = [
-            (Player(first_name="Luca", last_name="Bianchi"), None),
-            (Player(first_name="Anna", last_name="Rossi"), "anna@example.com"),
-        ]
-        service = PlayerService(players=FakePlayerStore(rows), transaction=FakeTransaction())
+    def test_list_squad_gives_a_player_no_email_and_no_action(self) -> None:
+        service = PlayerService(players=FakePlayerStore(ROWS), transaction=FakeTransaction())
 
-        with_emails = service.list_squad(with_emails=True)
-        without_emails = service.list_squad(with_emails=False)
+        squad = service.list_squad(actor_with(Role.PLAYER))
 
-        assert [(entry.has_account, entry.email) for entry in with_emails] == [
-            (False, None),
-            (True, "anna@example.com"),
+        assert squad.create is False
+        assert [(e.has_account, e.email, e.update, e.create_invite) for e in squad.entries] == [
+            (False, None, False, False),
+            (True, None, False, False),
+            (True, None, False, False),
         ]
-        assert [(entry.has_account, entry.email) for entry in without_emails] == [(False, None), (True, None)]
+
+    def test_list_squad_gives_an_admin_emails_and_actions_but_no_invite_on_an_admin_account(self) -> None:
+        service = PlayerService(players=FakePlayerStore(ROWS), transaction=FakeTransaction())
+
+        squad = service.list_squad(actor_with(Role.ADMIN))
+
+        assert squad.create is True
+        assert [(e.has_account, e.email, e.update, e.create_invite) for e in squad.entries] == [
+            (False, None, True, True),
+            (True, "anna@example.com", True, True),
+            (True, "boss@example.com", True, False),
+        ]
