@@ -15,9 +15,9 @@ The menu lists six sections, in this order:
 | Notifiche | `/notifications` |
 | Profilo | `/profile` |
 
-Every section shows a title, one line that says what it will be for, and an empty state. No section shows real data yet, except Home, which shows [panels with sample content](#home).
+Every section needs a [login](login.md). Rosa lists the players of the squad ([invite links](invite-links.md) explains the admin actions). The other sections show a title, one line that says what they will be for, and an empty state. They show no real data yet, except Home, which shows [panels with sample content](#home).
 
-The header stays at the top while you scroll. It shows the team name, "Atletico San Lorenzo", and the theme control. The section you are in is highlighted in the menu.
+The header stays at the top while you scroll. It shows the team name, "Atletico San Lorenzo", your name, the theme control and the logout button. The section you are in is highlighted in the menu.
 
 ## Home
 

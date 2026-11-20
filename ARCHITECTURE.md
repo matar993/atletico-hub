@@ -31,6 +31,8 @@ flowchart LR
 |---|---|---|
 | Web app | `frontend/` | Pages for players and staff; calls the API through the generated client `frontend/src/lib/api/` ([ADR-0003](docs/documents/architecture/adr/0003-web-app-is-a-react-spa-on-vite.md)) |
 | API | `backend/src/atletico_hub/` | HTTP routes, business rules, access to the database ([ADR-0002](docs/documents/architecture/adr/0002-backend-on-python-fastapi-and-postgres.md)) |
+| Players | `backend/src/atletico_hub/players/` | The squad: the `Player` model, adding a player, listing the squad |
+| Auth | `backend/src/atletico_hub/auth/` | Accounts, login and logout, database sessions behind an httpOnly cookie, invite links, the CSRF header check, the first admin (`make create-admin`) ([ADR-0007](docs/documents/architecture/adr/0007-email-and-password-login-with-personal-invite-links.md)) |
 | Database access | `backend/src/atletico_hub/db/` | Settings, engine, per-request session (`get_session`), declarative `Base`, Alembic migrations ([ADR-0005](docs/documents/architecture/adr/0005-database-access-through-sqlalchemy-and-alembic.md)) |
 | Database | Postgres | The team's data; its schema changes only through migrations |
 
@@ -45,4 +47,6 @@ flowchart LR
 
 ## Today
 
-The app holds only the skeleton: the API answers `GET /health` and the web app shows a layout (sticky header with the team name and the theme control, navigation menu, content area) with one placeholder page per section: Eventi, Convocazioni, Rosa, Notifiche, Profilo. Home shows three panels of sample content marked "Anteprima". The app has a light and a dark theme driven by design tokens. The database layer is in place, with no table yet. Each feature arrives as an OpenSpec change, which updates this document when it changes the components or their boundaries.
+The API is closed by default: every route needs a session, except the ones in an explicit list (`GET /health`, `POST /auth/login`, and the invite routes). Every request that changes data must carry the header `X-Requested-With: atletico-hub`. The database holds four tables: players, accounts, sessions and invites. An admin adds players and creates invite links; a player creates an account or sets a new password through a link, then signs in with email and password.
+
+The web app requires login for every section. It shows a layout (sticky header with the team name, the user, the theme control and a logout button; navigation menu; content area). Rosa lists the squad, with the admin actions for admins. The other sections (Eventi, Convocazioni, Notifiche, Profilo) are placeholder pages, and Home shows three panels of sample content marked "Anteprima". The app has a light and a dark theme driven by design tokens. Each feature arrives as an OpenSpec change, which updates this document when it changes the components or their boundaries.

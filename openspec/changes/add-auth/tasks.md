@@ -52,7 +52,7 @@
 
 ## 9. Documentation
 
-- [ ] 9.1 Add the user guide pages for login and for invite links (player and admin side) under `docs/documents/user-guide/` and list them in its index; update "Today" and the components table in `ARCHITECTURE.md`; verify every link resolves and `make validate` passes
+- [x] 9.1 Add the user guide pages for login and for invite links (player and admin side) under `docs/documents/user-guide/` and list them in its index; update "Today" and the components table in `ARCHITECTURE.md`; verify every link resolves and `make validate` passes
 
 ## 10. Integration check
 
