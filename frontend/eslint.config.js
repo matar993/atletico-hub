@@ -14,6 +14,8 @@ export default tseslint.config(
     files: ['**/*.{ts,tsx}'],
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
+  // Plain scripts served as they are (no bundler), run in the browser.
+  { files: ['public/**/*.js'], languageOptions: { globals: globals.browser } },
   // Playwright fixtures are called `use`, which the hooks rule takes for a hook.
   { files: ['e2e/**/*.ts'], rules: { 'react-hooks/rules-of-hooks': 'off' } },
 )

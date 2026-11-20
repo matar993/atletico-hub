@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 const SECTIONS = [
   { label: 'Home', path: '/' },
@@ -66,5 +66,60 @@ test.describe('phone', () => {
 
     await expect(page.getByRole('dialog')).toBeHidden()
     await expect(page).toHaveURL('/events')
+  })
+})
+
+// Records the left edge of the drawer on every frame while it opens: a slide shows up as negative values.
+async function sampleDrawerLeft(page: Page) {
+  await page.evaluate(() => {
+    const samples: number[] = []
+    ;(window as unknown as { drawerLeft: number[] }).drawerLeft = samples
+    const start = performance.now()
+    const tick = () => {
+      const drawer = document.querySelector('[role="dialog"]')
+      if (drawer) samples.push(Math.round(drawer.getBoundingClientRect().left))
+      if (performance.now() - start < 1500) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  })
+  await page.getByRole('button', { name: 'Apri il menu' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.waitForTimeout(1500)
+  return page.evaluate(() => (window as unknown as { drawerLeft: number[] }).drawerLeft)
+}
+
+test.describe('phone with motion', () => {
+  test.use({ viewport: { width: 390, height: 844 }, reducedMotion: 'no-preference' })
+
+  test('slides the drawer in', async ({ page }) => {
+    await page.goto('/')
+
+    const lefts = await sampleDrawerLeft(page)
+
+    expect(Math.min(...lefts)).toBeLessThan(0)
+    expect(lefts.at(-1)).toBe(0)
+  })
+})
+
+test.describe('phone with reduced motion', () => {
+  test.use({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' })
+
+  test('shows the drawer without sliding', async ({ page }) => {
+    await page.goto('/')
+
+    const lefts = await sampleDrawerLeft(page)
+
+    expect(lefts.length).toBeGreaterThan(0)
+    expect(lefts.every((left) => left === 0)).toBe(true)
+  })
+
+  test('still opens and closes the drawer', async ({ page }) => {
+    await page.goto('/')
+
+    await page.getByRole('button', { name: 'Apri il menu' }).click()
+    await expect(page.getByRole('dialog')).toBeVisible()
+    await page.getByRole('button', { name: 'Chiudi il menu' }).click()
+
+    await expect(page.getByRole('dialog')).toBeHidden()
   })
 })

@@ -9,4 +9,4 @@ Each OpenSpec change that adds a feature adds its page here.
 
 | Section | Contents | Read when |
 |---|---|---|
-| [navigation](navigation.md) | Sections, sidebar on a wide screen, drawer on a phone | You want to move between sections of the app |
+| [navigation](navigation.md) | Sections, Home panels, theme, sidebar on a wide screen, drawer on a phone | You want to move between sections of the app |
