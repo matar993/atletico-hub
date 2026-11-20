@@ -24,7 +24,7 @@
 
 ## 5. Browser tests
 
-- [ ] 5.1 Add `e2e/theme.spec.ts`: choosing Scuro survives a reload with `.dark` set right after navigation, Sistema follows `colorScheme` emulation, keyboard-only use of the theme menu; verify `make ui-e2e` passes
+- [x] 5.1 Add `e2e/theme.spec.ts`: choosing Scuro survives a reload with `.dark` set right after navigation, Sistema follows `colorScheme` emulation, keyboard-only use of the theme menu; verify `make ui-e2e` passes
 - [ ] 5.2 Extend the phone drawer spec for reduced motion (`reducedMotion: 'reduce'`) and run the full suite on the production image; verify `make ui-e2e` passes with no CSP violation in the console
 
 ## 6. Documentation and final checks
