@@ -1,7 +1,9 @@
 from pydantic import BaseModel
 
+from atletico_hub.schemas import RequestModel
 
-class AddPlayerRequest(BaseModel):
+
+class AddPlayerRequest(RequestModel):
     first_name: str
     last_name: str
 

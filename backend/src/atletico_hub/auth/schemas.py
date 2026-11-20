@@ -4,9 +4,10 @@ from typing import Self
 from pydantic import BaseModel, EmailStr, Field
 
 from atletico_hub.auth.models import Account, Role
+from atletico_hub.schemas import RequestModel
 
 
-class LoginRequest(BaseModel):
+class LoginRequest(RequestModel):
     email: str
     password: str
 
@@ -27,7 +28,7 @@ class CurrentUser(BaseModel):
         )
 
 
-class CreateInviteRequest(BaseModel):
+class CreateInviteRequest(RequestModel):
     player_id: int
 
 
@@ -43,6 +44,6 @@ class InviteDetails(BaseModel):
     email: str | None
 
 
-class AcceptInviteRequest(BaseModel):
+class AcceptInviteRequest(RequestModel):
     email: EmailStr | None = None
     password: str = Field(min_length=8, max_length=128)

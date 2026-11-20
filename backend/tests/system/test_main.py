@@ -165,3 +165,33 @@ class TestRoleTable:
         )
 
         assert answers == ROLE_TABLE[(method, path)]
+
+
+class TestStrictBodies:
+    @pytest.mark.parametrize(
+        ("path", "body"),
+        [
+            ("/auth/login", {"email": "a@example.com", "password": "x", "role": "admin"}),
+            ("/auth/invites/some-token/accept", {"password": "long-enough-pass", "role": "admin"}),
+        ],
+    )
+    def test_open_route_answers_422_to_an_unknown_field(self, client: TestClient, path: str, body: dict) -> None:
+        assert client.post(path, json=body, headers=WRITE_HEADER).status_code == 422
+
+    @pytest.mark.parametrize(
+        ("path", "body"),
+        [
+            ("/players", {"first_name": "Luca", "last_name": "Bianchi", "role": "admin"}),
+            ("/auth/invites", {"player_id": 1, "role": "admin"}),
+        ],
+    )
+    def test_admin_route_answers_422_to_an_unknown_field_and_changes_nothing(
+        self, client: TestClient, db_session: DbSession, path: str, body: dict
+    ) -> None:
+        admin = signed_in_client(db_session, Role.ADMIN)
+        players_before = len(admin.get("/players").json())
+
+        response = admin.post(path, json=body, headers=WRITE_HEADER)
+
+        assert response.status_code == 422
+        assert len(admin.get("/players").json()) == players_before
