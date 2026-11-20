@@ -1,4 +1,6 @@
 import { Link } from '@tanstack/react-router'
+import { motion } from 'framer-motion'
+import { useId } from 'react'
 import { NAV_ENTRIES } from './navigation'
 
 type NavMenuProps = {
@@ -6,6 +8,9 @@ type NavMenuProps = {
 }
 
 export function NavMenu({ onNavigate }: NavMenuProps) {
+  // The sidebar and the drawer both render this menu: each needs its own marker, or the two would animate as one.
+  const markerId = useId()
+
   return (
     <nav aria-label="Menu principale">
       <ul className="space-y-1">
@@ -15,11 +20,23 @@ export function NavMenu({ onNavigate }: NavMenuProps) {
               to={to}
               activeOptions={{ exact: to === '/' }}
               onClick={onNavigate}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100"
-              activeProps={{ className: 'bg-slate-200 font-semibold text-slate-900' }}
+              className="relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: 'text-accent-foreground hover:text-accent-foreground' }}
             >
-              <Icon aria-hidden="true" className="size-5" />
-              {label}
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <motion.span
+                      layoutId={markerId}
+                      aria-hidden="true"
+                      className="absolute inset-0 rounded-md bg-accent"
+                      transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+                    />
+                  )}
+                  <Icon aria-hidden="true" className="relative size-5" />
+                  <span className="relative">{label}</span>
+                </>
+              )}
             </Link>
           </li>
         ))}
