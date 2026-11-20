@@ -31,7 +31,7 @@
 - [x] 5.2 Add `users/service.py` with `list_accounts(actor)` and `change_role(actor, account_id, role)` (design D5, D7); verify unit tests on fakes for promotion, self-demotion, last admin, unknown account, no-op and link cancellation
 - [x] 5.3 Add an integration test that runs two demotions of the last two admins on two connections; verify one succeeds, the other raises the last-admin error, and one admin is left
 - [x] 5.4 Add `users/schemas.py` and `users/router.py` (`GET /users`, `PUT /users/{account_id}/role`), wire it in `create_app`, add rows to the role matrix; verify system tests for every API scenario of the `user-roles` delta spec, including a demoted admin getting 403 in the same session
-- [ ] 5.5 Run `make lint`, `make typecheck` and `make lint-imports`; verify all three pass with the new package
+- [x] 5.5 Run `make lint`, `make typecheck` and `make lint-imports`; verify all three pass with the new package
 
 ## 6. Commands on the API host
 
