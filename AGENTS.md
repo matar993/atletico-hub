@@ -17,12 +17,6 @@ Read the document that matches the task before you change anything.
 | Verified facts | [docs/facts/](docs/facts/README.md) |
 | Specs and changes in progress | `openspec/specs/`, `openspec/changes/` |
 
-### Subagents (`.agents/agents/`)
-
-| Agent | Use for |
-|---|---|
-| [`implementer`](.agents/agents/implementer.md) | One approved OpenSpec task, and long-running commands such as the test suite, an image build or a workflow run watch |
-
 ### Skills (`.agents/skills/`)
 
 | Purpose | Skills |
@@ -141,16 +135,13 @@ The test: "Am I recommending this because it is the best option, or because the 
 
 - Run the checks of the [Definition of Done](CONTRIBUTING.md#definition-of-done) before every commit and every push. Merge only through the [merge protocol](CONTRIBUTING.md#merge-protocol). Commands: [Setup and development](docs/documents/developer-guide/setup/README.md#commands-and-checks).
 - The pre-commit hook is only a last-chance safety net. Never rely on it to find problems.
-- Run any task expected to take 30 seconds to 1 minute or more in a subagent, for example the test suite or an image build. The main session stays idle for interactive work with the user.
-- Launch subagents with the `implementer` agent (`.agents/agents/implementer.md`), which pins the model. Never use the built-in agents, such as `worker`, for these tasks.
-- A run that changes no file (a question, a long test run, a pipeline watch) must not be judged as an implementation. In the pi.dev harness (`pi-subagents`) the `implementer` agent is a checked writer, and a run without its acceptance report ends as `failed` even when the answer is right. Launch such a run with `options.acceptance: { "level": "none", "reason": "<why>" }` and state in the task that no file may change. Other harnesses: use the equivalent setting, or a read-only agent, and keep the same rule.
-- A long-running command writes its output to a log file (`cmd 2>&1 | tee /tmp/<name>.log`). The subagent tails the log and reports its path, so the main session can read progress at any time. Never leave a long command silent in one blocking call.
+- Run any command expected to take 30 seconds or more in the background of the main session, for example the test suite, an image build or a workflow run watch. The session stays free for interactive work with the user.
+- A long-running command writes its output to a log file (`cmd 2>&1 | tee /tmp/<name>.log`). Read the log to follow progress. Never leave a long command silent in one blocking call.
 
-### 9. Delegation and git protocol
+### 9. Task and git protocol
 **Tight loop: small tasks, reviewed one by one. Commit often, push only on request.**
 
-- Implement the tasks of an OpenSpec change with `implementer` subagents. Give each one a single small task, not a task group. Review its result and approve it before launching the next. Do not chain tasks inside one subagent.
-- Launch every subagent async (`async: true`), so the interactive session stays free. One writer per checkout: do not run two implementers on the same working tree.
+- Implement the tasks of an OpenSpec change in the main session, one task at a time. Do not use subagents to write code. After each task, commit and let the user review the diff before the next one.
 - Do not push, and do not create a worktree, unless the user asks. A worktree is for lesser pull requests. A major pull request is checked out in the main checkout.
 - Commit often: one Conventional Commit per task or logical step ([`conventional-commits`](.agents/skills/conventional-commits/SKILL.md)). The commits are a log of the work: the pull request is squashed on merge, so they stay out of the trunk history.
 - Do not push every commit: each push can start a CI pipeline. Push when the user says so.
