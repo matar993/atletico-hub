@@ -78,7 +78,7 @@ Alternative: put these routes in `auth`. Rejected: `auth` is about identity and 
 
 ### D6. No invite link for an admin account
 
-`AuthService.create_invite` loads the account of the player; when its role is `admin` it raises `AdminAccountError`, mapped to 403 with "La password di un admin si reimposta solo da riga di comando". Promotion cancels open links (D5), so a link created before the promotion cannot reset an admin either. Opening or accepting a link does not check the role again: no open link of an admin can exist.
+`AuthService.create_invite` loads the account of the player; when its role is `admin` it raises `AdminAccountError`, mapped to 409 with "La password di un admin si reimposta solo da riga di comando". Promotion cancels open links (D5), so a link created before the promotion cannot reset an admin either. Opening or accepting a link does not check the role again: no open link of an admin can exist.
 
 ### D7. Last admin under concurrency
 

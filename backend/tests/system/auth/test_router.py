@@ -238,9 +238,9 @@ class TestAuthRouter:
 
     @pytest.mark.parametrize(
         ("target_role", "own_account", "expected"),
-        [(Role.ADMIN, False, 403), (Role.ADMIN, True, 403), (Role.PLAYER, False, 200)],
+        [(Role.ADMIN, False, 409), (Role.ADMIN, True, 409), (Role.PLAYER, False, 200)],
     )
-    def test_create_invite_for_an_admin_account_answers_403_and_creates_no_link(
+    def test_create_invite_for_an_admin_account_answers_409_and_creates_no_link(
         self, client: TestClient, db_session: DbSession, target_role: Role, own_account: bool, expected: int
     ) -> None:
         admin = Account(
@@ -265,7 +265,7 @@ class TestAuthRouter:
         response = client.post("/auth/invites", json={"player_id": target.player_id}, headers=WRITE_HEADER)
 
         assert response.status_code == expected
-        if expected == 403:
+        if expected == 409:
             assert response.json()["detail"] == "La password di un admin si reimposta solo da riga di comando"
             assert db_session.scalar(select(func.count()).select_from(Invite)) == 0
 

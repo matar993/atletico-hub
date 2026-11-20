@@ -15,7 +15,7 @@ An admin SHALL be able to create an invite link for any player of the squad whos
 
 #### Scenario: No link for an admin account
 - **WHEN** an admin asks for an invite link for a player whose account has the role `admin`, their own included
-- **THEN** the API answers 403 with the message "La password di un admin si reimposta solo da riga di comando" and creates no link
+- **THEN** the API answers 409 with the message "La password di un admin si reimposta solo da riga di comando" and creates no link
 
 #### Scenario: Link for a demoted admin
 - **WHEN** an admin asks for an invite link for a player whose account was admin and now has the role `player`
