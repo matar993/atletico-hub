@@ -1,7 +1,7 @@
 # ADR-0007: Users sign in with email and password; accounts come only from personal invite links; sessions live in Postgres
 
 **Date**: 2026-11-20
-**Status**: proposed
+**Status**: accepted
 **Deciders**: Marco Scalzo
 
 ## Context

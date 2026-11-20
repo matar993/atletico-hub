@@ -4,7 +4,7 @@
 
 See proposal.md for the motivation and the specs for the behavior. The API has no feature yet: only `GET /health` and the database layer (`atletico_hub/db/`), with no table. Features follow the layers of ADR-0006. The web app is a TanStack Router SPA whose routes are flat files under `src/routes/`, all rendered inside `AppLayout`; it reaches the API only on its own origin, under `/api` (ADR-0004), and nginx or Vite strips the prefix. The browser tests run on the production build with no API behind them.
 
-The project-wide part of this change, how users sign in, is recorded in [ADR-0007](../../../docs/documents/architecture/adr/0007-email-and-password-login-with-personal-invite-links.md) (proposed). Every other decision stays here.
+The project-wide part of this change, how users sign in, is recorded in [ADR-0007](../../../docs/documents/architecture/adr/0007-email-and-password-login-with-personal-invite-links.md) (accepted). Every other decision stays here.
 
 ## Goals / Non-Goals
 
