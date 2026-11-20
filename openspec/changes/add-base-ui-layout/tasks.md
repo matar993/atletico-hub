@@ -26,7 +26,7 @@
 
 ## 6. Integration check
 
-- [ ] 6.1 Run `make ui-checks` and `make ui-e2e`; verify both pass on the final tree
+- [x] 6.1 Run `make ui-checks` and `make ui-e2e`; verify both pass on the final tree
 
 ## Workflow follow-up
 
