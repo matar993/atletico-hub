@@ -11,7 +11,7 @@ const SQUAD = [
   { id: 2, first_name: 'Luca', last_name: 'Bianchi', has_account: false, email: null },
 ]
 
-function signInAs(role: 'admin' | 'player', squad: typeof SQUAD = SQUAD) {
+function signInAs(role: 'admin' | 'player', squad: typeof SQUAD = SQUAD, noInviteFor: number[] = []) {
   vi.mocked(api.GET).mockImplementation((async (path: string) =>
     path === '/auth/me'
       ? { data: { first_name: 'Me', last_name: 'Self', email: 'me@example.com', role }, response: OK() }
@@ -21,7 +21,10 @@ function signInAs(role: 'admin' | 'player', squad: typeof SQUAD = SQUAD) {
             items: squad.map((member) => ({
               ...member,
               email: role === 'admin' ? member.email : null,
-              permissions: { update: role === 'admin', create_invite: role === 'admin' },
+              permissions: {
+                update: role === 'admin',
+                create_invite: role === 'admin' && !noInviteFor.includes(member.id),
+              },
             })),
           },
           response: OK(),
@@ -67,6 +70,17 @@ describe('SquadPage', () => {
       expect(await screen.findByText(/anna@example.com/)).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Aggiungi giocatore' })).toBeInTheDocument()
       expect(screen.getAllByRole('button', { name: "Crea link d'invito" })).toHaveLength(2)
+    })
+
+    it('offers no invite button on the row of an admin account', async () => {
+      signInAs('admin', SQUAD, [1])
+      await renderApp('/squad')
+
+      expect(await screen.findByText('Anna Rossi')).toBeInTheDocument()
+      const adminRow = screen.getByText('Anna Rossi').closest('li') as HTMLElement
+      const playerRow = screen.getByText('Luca Bianchi').closest('li') as HTMLElement
+      expect(within(adminRow).queryByRole('button', { name: "Crea link d'invito" })).not.toBeInTheDocument()
+      expect(within(playerRow).getByRole('button', { name: "Crea link d'invito" })).toBeInTheDocument()
     })
 
     it('adds a player and reloads the list', async () => {

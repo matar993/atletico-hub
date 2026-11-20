@@ -9,7 +9,7 @@ type Member = components['schemas']['SquadMember']
 
 type Invite = { link: string; expiresAt: string }
 
-export function PlayerRow({ member, isAdmin }: { member: Member; isAdmin: boolean }) {
+export function PlayerRow({ member }: { member: Member }) {
   const [invite, setInvite] = useState<Invite | null>(null)
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -39,10 +39,10 @@ export function PlayerRow({ member, isAdmin }: { member: Member; isAdmin: boolea
           </p>
           <p className="text-sm text-muted-foreground">
             {member.has_account ? 'Ha un account' : 'Senza account'}
-            {isAdmin && member.email && ` · ${member.email}`}
+            {member.email && ` · ${member.email}`}
           </p>
         </div>
-        {isAdmin && (
+        {member.permissions.create_invite && (
           <button type="button" onClick={createInvite} className={BUTTON_SECONDARY}>
             Crea link d&apos;invito
           </button>
