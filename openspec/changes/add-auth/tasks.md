@@ -42,7 +42,7 @@
 
 ## 7. Web app: invite and Rosa
 
-- [ ] 7.1 Add the invite page at `/invite/$token` (new account form, reset form, "Link non valido o scaduto. Chiedi un nuovo link all'admin."); verify with unit tests for the three states and the submit of each form
+- [x] 7.1 Add the invite page at `/invite/$token` (new account form, reset form, "Link non valido o scaduto. Chiedi un nuovo link all'admin."); verify with unit tests for the three states and the submit of each form
 - [ ] 7.2 Replace the Rosa placeholder with the squad list, and for admins the "Aggiungi giocatore" dialog and the invite link with the copy button and the shown-once warning; verify with unit tests for the role `player` (no email, no action) and the role `admin`
 
 ## 8. Browser tests
