@@ -22,6 +22,7 @@ from atletico_hub.auth.schemas import (
 )
 from atletico_hub.auth.service import (
     AccountLockedError,
+    AdminAccountError,
     AuthService,
     EmailInUseError,
     EmailRequiredError,
@@ -70,6 +71,10 @@ def create_invite(body: CreateInviteRequest, service: ServiceDep) -> InviteCreat
         token, invite = service.create_invite(player_id=body.player_id)
     except PlayerNotFoundError as ex:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Player not found") from ex
+    except AdminAccountError as ex:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, detail="La password di un admin si reimposta solo da riga di comando"
+        ) from ex
     return InviteCreated(path=f"/invite/{token}", expires_at=invite.expires_at)
 
 

@@ -7,6 +7,7 @@ from atletico_hub.auth.service import (
     DUMMY_PASSWORD_HASH,
     INVITE_DURATION,
     AccountLockedError,
+    AdminAccountError,
     AuthService,
     EmailInUseError,
     EmailRequiredError,
@@ -341,6 +342,25 @@ class TestAuthService:
         with pytest.raises(PlayerNotFoundError):
             service.create_invite(player_id=99)
 
+    @pytest.mark.parametrize(("role", "refused"), [(Role.ADMIN, True), (Role.PLAYER, False)])
+    def test_create_invite_refuses_a_player_whose_account_is_admin_and_stores_nothing(
+        self, role: Role, refused: bool
+    ) -> None:
+        store = FakeAuthStore()
+        player = Player(id=1, first_name="Anna", last_name="Rossi")
+        store.players.append(player)
+        store.accounts.append(Account(player=player, email="a@example.com", password_hash="x", role=role))
+        transaction = FakeTransaction()
+        service = AuthService(store=store, hasher=FakeHasher(), clock=FakeClock(START), transaction=transaction)
+
+        if refused:
+            with pytest.raises(AdminAccountError):
+                service.create_invite(player_id=1)
+            assert (store.invites, transaction.commits) == ([], 0)
+        else:
+            service.create_invite(player_id=1)
+            assert len(store.invites) == 1
+
     def test_create_invite_cancels_the_earlier_links_of_the_player(self) -> None:
         store = FakeAuthStore()
         store.players.append(Player(id=1, first_name="Anna", last_name="Rossi"))
@@ -485,7 +505,7 @@ class TestAuthService:
                 player=player,
                 email="anna@example.com",
                 password_hash="hashed:old-password",
-                role=Role.ADMIN,
+                role=Role.PLAYER,
                 failed_logins=0,
             )
         )
@@ -501,7 +521,7 @@ class TestAuthService:
         with pytest.raises(InvalidSessionError):
             service.authenticate(token=second_phone)
         assert service.authenticate(token=third_device) == account
-        assert (account.email, account.role) == ("anna@example.com", Role.ADMIN)
+        assert (account.email, account.role) == ("anna@example.com", Role.PLAYER)
         service.login(email="anna@example.com", password="new-password")
         with pytest.raises(InvalidCredentialsError):
             service.login(email="anna@example.com", password="old-password")

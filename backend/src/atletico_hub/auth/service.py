@@ -38,6 +38,10 @@ class PlayerNotFoundError(Exception):
     pass
 
 
+class AdminAccountError(Exception):
+    pass
+
+
 class EmailInUseError(Exception):
     pass
 
@@ -141,6 +145,9 @@ class AuthService:
         player = self._store.player_by_id(player_id)
         if player is None:
             raise PlayerNotFoundError(f"No player with id {player_id}")
+        account = self._store.account_by_player(player_id)
+        if account is not None and account.role == Role.ADMIN:
+            raise AdminAccountError("The password of an admin account is reset only from the command line")
         now = self._clock.now()
         self._store.delete_open_invites_of_player(player_id)
         token = generate_token()

@@ -23,7 +23,7 @@
 
 ## 4. Invites: no link for an admin
 
-- [ ] 4.1 Refuse invite creation for an admin account in `AuthService.create_invite` and map it to 403 (design D6); verify unit and system tests for an admin target, the user's own admin account and a former admin
+- [x] 4.1 Refuse invite creation for an admin account in `AuthService.create_invite` and map it to 403 (design D6); verify unit and system tests for an admin target, the user's own admin account and a former admin
 
 ## 5. Users and roles (API)
 

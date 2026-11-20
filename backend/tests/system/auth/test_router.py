@@ -236,6 +236,39 @@ class TestAuthRouter:
 
         assert response.status_code == 404
 
+    @pytest.mark.parametrize(
+        ("target_role", "own_account", "expected"),
+        [(Role.ADMIN, False, 403), (Role.ADMIN, True, 403), (Role.PLAYER, False, 200)],
+    )
+    def test_create_invite_for_an_admin_account_answers_403_and_creates_no_link(
+        self, client: TestClient, db_session: DbSession, target_role: Role, own_account: bool, expected: int
+    ) -> None:
+        admin = Account(
+            player=Player(first_name="Anna", last_name="Rossi"),
+            email="anna@example.com",
+            password_hash=Argon2PasswordHasher().hash(PASSWORD),
+            role=Role.ADMIN,
+            failed_logins=0,
+        )
+        other = Account(
+            player=Player(first_name="Boss", last_name="Verdi"),
+            email="boss@example.com",
+            password_hash="x",
+            role=target_role,
+            failed_logins=0,
+        )
+        db_session.add_all([admin, other])
+        db_session.flush()
+        client.post("/auth/login", json={"email": "anna@example.com", "password": PASSWORD}, headers=WRITE_HEADER)
+        target = admin if own_account else other
+
+        response = client.post("/auth/invites", json={"player_id": target.player_id}, headers=WRITE_HEADER)
+
+        assert response.status_code == expected
+        if expected == 403:
+            assert response.json()["detail"] == "La password di un admin si reimposta solo da riga di comando"
+            assert db_session.scalar(select(func.count()).select_from(Invite)) == 0
+
     def test_open_invite_answers_the_player_without_an_account(self, client: TestClient, db_session: DbSession) -> None:
         admin = Account(
             player=Player(first_name="Anna", last_name="Rossi"),
@@ -260,16 +293,23 @@ class TestAuthRouter:
         self, client: TestClient, db_session: DbSession
     ) -> None:
         admin = Account(
-            player=Player(first_name="Anna", last_name="Rossi"),
-            email="anna@example.com",
+            player=Player(first_name="Boss", last_name="Verdi"),
+            email="boss@example.com",
             password_hash=Argon2PasswordHasher().hash(PASSWORD),
             role=Role.ADMIN,
             failed_logins=0,
         )
-        db_session.add(admin)
+        anna = Account(
+            player=Player(first_name="Anna", last_name="Rossi"),
+            email="anna@example.com",
+            password_hash=Argon2PasswordHasher().hash(PASSWORD),
+            role=Role.PLAYER,
+            failed_logins=0,
+        )
+        db_session.add_all([admin, anna])
         db_session.flush()
-        client.post("/auth/login", json={"email": "anna@example.com", "password": PASSWORD}, headers=WRITE_HEADER)
-        path = client.post("/auth/invites", json={"player_id": admin.player.id}, headers=WRITE_HEADER).json()["path"]
+        client.post("/auth/login", json={"email": "boss@example.com", "password": PASSWORD}, headers=WRITE_HEADER)
+        path = client.post("/auth/invites", json={"player_id": anna.player.id}, headers=WRITE_HEADER).json()["path"]
 
         response = TestClient(client.app, base_url="https://testserver").get(
             f"/auth/invites/{path.removeprefix('/invite/')}"
@@ -410,18 +450,29 @@ class TestAuthRouter:
     def test_accept_invite_for_a_player_with_an_account_resets_the_password_and_ends_the_sessions(
         self, client: TestClient, db_session: DbSession
     ) -> None:
-        admin = Account(
-            player=Player(first_name="Anna", last_name="Rossi"),
-            email="anna@example.com",
+        boss = Account(
+            player=Player(first_name="Boss", last_name="Verdi"),
+            email="boss@example.com",
             password_hash=Argon2PasswordHasher().hash(PASSWORD),
             role=Role.ADMIN,
             failed_logins=0,
         )
-        db_session.add(admin)
+        anna = Account(
+            player=Player(first_name="Anna", last_name="Rossi"),
+            email="anna@example.com",
+            password_hash=Argon2PasswordHasher().hash(PASSWORD),
+            role=Role.PLAYER,
+            failed_logins=0,
+        )
+        db_session.add_all([boss, anna])
         db_session.flush()
-        client.post("/auth/login", json={"email": "anna@example.com", "password": PASSWORD}, headers=WRITE_HEADER)
+        second_device = TestClient(client.app, base_url="https://testserver")
+        second_device.post(
+            "/auth/login", json={"email": "anna@example.com", "password": PASSWORD}, headers=WRITE_HEADER
+        )
+        client.post("/auth/login", json={"email": "boss@example.com", "password": PASSWORD}, headers=WRITE_HEADER)
         token = (
-            client.post("/auth/invites", json={"player_id": admin.player.id}, headers=WRITE_HEADER)
+            client.post("/auth/invites", json={"player_id": anna.player.id}, headers=WRITE_HEADER)
             .json()["path"]
             .removeprefix("/invite/")
         )
@@ -432,8 +483,8 @@ class TestAuthRouter:
         )
 
         assert response.status_code == 200
-        assert response.json()["role"] == "admin"
-        assert client.get("/auth/me").status_code == 401
+        assert response.json()["role"] == "player"
+        assert second_device.get("/auth/me").status_code == 401
         assert third_device.get("/auth/me").status_code == 200
         login = third_device.post(
             "/auth/login",
@@ -444,17 +495,24 @@ class TestAuthRouter:
 
     def test_accept_invite_answers_404_to_a_used_link(self, client: TestClient, db_session: DbSession) -> None:
         admin = Account(
-            player=Player(first_name="Anna", last_name="Rossi"),
-            email="anna@example.com",
+            player=Player(first_name="Boss", last_name="Verdi"),
+            email="boss@example.com",
             password_hash=Argon2PasswordHasher().hash(PASSWORD),
             role=Role.ADMIN,
             failed_logins=0,
         )
-        db_session.add(admin)
+        anna = Account(
+            player=Player(first_name="Anna", last_name="Rossi"),
+            email="anna@example.com",
+            password_hash=Argon2PasswordHasher().hash(PASSWORD),
+            role=Role.PLAYER,
+            failed_logins=0,
+        )
+        db_session.add_all([admin, anna])
         db_session.flush()
-        client.post("/auth/login", json={"email": "anna@example.com", "password": PASSWORD}, headers=WRITE_HEADER)
+        client.post("/auth/login", json={"email": "boss@example.com", "password": PASSWORD}, headers=WRITE_HEADER)
         token = (
-            client.post("/auth/invites", json={"player_id": admin.player.id}, headers=WRITE_HEADER)
+            client.post("/auth/invites", json={"player_id": anna.player.id}, headers=WRITE_HEADER)
             .json()["path"]
             .removeprefix("/invite/")
         )
