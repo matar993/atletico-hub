@@ -4,6 +4,7 @@ import { api } from '@/lib/api/client'
 import { apiErrorMessage } from '@/lib/api/errors'
 import type { components } from '@/lib/api/schema'
 import { BUTTON_SECONDARY, FORM_ERROR } from '@/ui/classes'
+import { RenamePlayerDialog } from './RenamePlayerDialog'
 
 type Member = components['schemas']['SquadMember']
 
@@ -42,11 +43,14 @@ export function PlayerRow({ member }: { member: Member }) {
             {member.email && ` · ${member.email}`}
           </p>
         </div>
-        {member.permissions.create_invite && (
-          <button type="button" onClick={createInvite} className={BUTTON_SECONDARY}>
-            Crea link d&apos;invito
-          </button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {member.permissions.update && <RenamePlayerDialog member={member} />}
+          {member.permissions.create_invite && (
+            <button type="button" onClick={createInvite} className={BUTTON_SECONDARY}>
+              Crea link d&apos;invito
+            </button>
+          )}
+        </div>
       </div>
       {error && (
         <p role="alert" className={FORM_ERROR}>

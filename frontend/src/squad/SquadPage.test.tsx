@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '@/lib/api/client'
 import { renderApp } from '@/test/renderApp'
 
-vi.mock('@/lib/api/client', () => ({ api: { GET: vi.fn(), POST: vi.fn() } }))
+vi.mock('@/lib/api/client', () => ({ api: { GET: vi.fn(), POST: vi.fn(), PATCH: vi.fn() } }))
 
 const OK = () => new Response(null, { status: 200 })
 const SQUAD = [
@@ -43,6 +43,7 @@ describe('SquadPage', () => {
       expect(screen.queryByText(/anna@example.com/)).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Aggiungi giocatore' })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: "Crea link d'invito" })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Modifica nome' })).not.toBeInTheDocument()
     })
 
     it('says whether each player has an account', async () => {
@@ -116,6 +117,50 @@ describe('SquadPage', () => {
       fireEvent.click(within(dialog).getByRole('button', { name: 'Aggiungi' }))
 
       expect(await within(dialog).findByText('A name needs 1 to 50 characters, got 0')).toBeInTheDocument()
+    })
+
+    it('renames a player from the row, keeps the old name in the form and reloads the squad and the current user', async () => {
+      vi.mocked(api.PATCH).mockResolvedValue({ data: { id: 2 }, response: OK() } as never)
+      await renderApp('/squad')
+      await screen.findByText('Luca Bianchi')
+
+      const calls = (path: string) =>
+        (vi.mocked(api.GET).mock.calls as unknown as [string][]).filter(([called]) => called === path).length
+      const before = { squad: calls('/players'), me: calls('/auth/me') }
+
+      const row = screen.getByText('Luca Bianchi').closest('li') as HTMLElement
+      fireEvent.click(within(row).getByRole('button', { name: 'Modifica nome' }))
+      const dialog = await screen.findByRole('dialog')
+      expect(within(dialog).getByLabelText('Nome')).toHaveValue('Luca')
+      expect(within(dialog).getByLabelText('Cognome')).toHaveValue('Bianchi')
+      fireEvent.change(within(dialog).getByLabelText('Cognome'), { target: { value: 'Bianchi Rossi' } })
+      fireEvent.click(within(dialog).getByRole('button', { name: 'Salva' }))
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+      expect(api.PATCH).toHaveBeenCalledWith('/players/{player_id}', {
+        params: { path: { player_id: 2 } },
+        body: { first_name: 'Luca', last_name: 'Bianchi Rossi' },
+      })
+      expect(calls('/players')).toBe(before.squad + 1)
+      expect(calls('/auth/me')).toBe(before.me + 1)
+    })
+
+    it('shows the error of the API when a rename is refused and keeps the dialog open', async () => {
+      vi.mocked(api.PATCH).mockResolvedValue({
+        error: { detail: 'A name needs 1 to 50 characters, got 0' },
+        response: new Response(null, { status: 422 }),
+      } as never)
+      await renderApp('/squad')
+      await screen.findByText('Luca Bianchi')
+
+      const row = screen.getByText('Luca Bianchi').closest('li') as HTMLElement
+      fireEvent.click(within(row).getByRole('button', { name: 'Modifica nome' }))
+      const dialog = await screen.findByRole('dialog')
+      fireEvent.change(within(dialog).getByLabelText('Nome'), { target: { value: ' ' } })
+      fireEvent.click(within(dialog).getByRole('button', { name: 'Salva' }))
+
+      expect(await within(dialog).findByText('A name needs 1 to 50 characters, got 0')).toBeInTheDocument()
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
     it('creates an invite link, shows it once with its warning and copies it', async () => {

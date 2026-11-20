@@ -42,7 +42,7 @@
 ## 7. Web app: Rosa
 
 - [x] 7.1 Make Rosa read the flags of `GET /players` in place of `role` (design D12); verify unit tests for player and admin views, including no invite button on an admin's row
-- [ ] 7.2 Add the "Modifica nome" dialog on rows with `update`, refreshing the squad and the current user after a save; verify unit tests for save and API error
+- [x] 7.2 Add the "Modifica nome" dialog on rows with `update`, refreshing the squad and the current user after a save; verify unit tests for save and API error
 - [ ] 7.3 Replace the Profilo placeholder with `src/profile/ProfilePage.tsx` (design D12): name, email and role from the current user, and a form that calls `PATCH /profile`; verify unit tests for save, the header name after save, and the API message on an empty name
 
 ## 8. Web app: Utenti and not authorized
