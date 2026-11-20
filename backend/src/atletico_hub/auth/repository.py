@@ -2,11 +2,15 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session as DbSession
 
 from atletico_hub.auth.models import Account, Invite, Session
+from atletico_hub.players.models import Player
 
 
 class AuthRepository:
     def __init__(self, session: DbSession) -> None:
         self._session = session
+
+    def player_by_id(self, player_id: int) -> Player | None:
+        return self._session.get(Player, player_id)
 
     def add_account(self, account: Account) -> Account:
         self._session.add(account)

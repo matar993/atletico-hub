@@ -10,6 +10,15 @@ NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 class TestAuthRepository:
+    def test_player_by_id_finds_the_player(self, db_session: DbSession) -> None:
+        repository = AuthRepository(db_session)
+        player = Player(first_name="Anna", last_name="Rossi")
+        db_session.add(player)
+        db_session.flush()
+
+        assert repository.player_by_id(player_id=player.id) == player
+        assert repository.player_by_id(player_id=0) is None
+
     def test_account_by_email_finds_the_account(self, db_session: DbSession) -> None:
         repository = AuthRepository(db_session)
         player = Player(first_name="Anna", last_name="Rossi")
@@ -96,7 +105,7 @@ class TestAuthRepository:
         player = Player(first_name="Anna", last_name="Rossi")
         db_session.add(player)
         db_session.flush()
-        repository.add_invite(invite=Invite(player_id=player.id, token_hash="abc", expires_at=NOW))
+        repository.add_invite(invite=Invite(player=player, token_hash="abc", expires_at=NOW))
 
         invite = repository.invite_by_token_hash(token_hash="abc")
 
@@ -110,9 +119,9 @@ class TestAuthRepository:
         other = Player(first_name="Luca", last_name="Bianchi")
         db_session.add_all([player, other])
         db_session.flush()
-        repository.add_invite(invite=Invite(player_id=player.id, token_hash="open", expires_at=NOW))
-        repository.add_invite(invite=Invite(player_id=player.id, token_hash="used", expires_at=NOW, used_at=NOW))
-        repository.add_invite(invite=Invite(player_id=other.id, token_hash="other", expires_at=NOW))
+        repository.add_invite(invite=Invite(player=player, token_hash="open", expires_at=NOW))
+        repository.add_invite(invite=Invite(player=player, token_hash="used", expires_at=NOW, used_at=NOW))
+        repository.add_invite(invite=Invite(player=other, token_hash="other", expires_at=NOW))
 
         repository.delete_open_invites_of_player(player_id=player.id)
 
