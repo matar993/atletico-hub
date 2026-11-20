@@ -9,7 +9,7 @@ How to configure, start and develop the app locally.
 
 - Docker with Docker Compose
 - [uv](https://docs.astral.sh/uv/): installs the Python version of `backend/.python-version` (3.14)
-- Node 22 (`frontend/.nvmrc`), only for the browser tests on the host
+- Node 26 (`frontend/.nvmrc`), only for the browser tests on the host
 - OpenSpec CLI: `npm install --global @fission-ai/openspec`
 - [gh](https://cli.github.com/), signed in with `gh auth login`, for pull requests
 

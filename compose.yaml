@@ -43,7 +43,7 @@ services:
   # The web app's development server. Dependencies live in a volume and are installed again
   # only when the hash of the lock file differs from the one of the last install.
   ui:
-    image: node:22-alpine
+    image: node:26-alpine
     restart: unless-stopped
     working_dir: /app
     command:
