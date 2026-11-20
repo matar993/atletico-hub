@@ -7,10 +7,11 @@ from atletico_hub.auth.dependencies import (
     current_account,
     get_auth_service,
     get_auth_settings,
-    require_admin,
+    require,
     set_session_cookie,
 )
 from atletico_hub.auth.models import Account
+from atletico_hub.auth.permissions import Permission
 from atletico_hub.auth.schemas import (
     AcceptInviteRequest,
     CreateInviteRequest,
@@ -63,7 +64,7 @@ def me(account: Annotated[Account, Depends(current_account)]) -> CurrentUser:
     return CurrentUser.from_account(account)
 
 
-@router.post("/invites", dependencies=[Depends(require_admin)])
+@router.post("/invites", dependencies=[Depends(require(Permission.INVITES_CREATE))])
 def create_invite(body: CreateInviteRequest, service: ServiceDep) -> InviteCreated:
     try:
         token, invite = service.create_invite(player_id=body.player_id)

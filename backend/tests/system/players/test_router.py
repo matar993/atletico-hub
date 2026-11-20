@@ -130,3 +130,24 @@ class TestPlayerRouter:
 
         assert response.status_code == 422
         assert db_session.scalar(select(func.count()).select_from(Player)) == 1
+
+
+class TestPlayerRouterErrorOrder:
+    def test_add_player_answers_403_to_a_player_who_sends_an_invalid_body(
+        self, client: TestClient, db_session: DbSession
+    ) -> None:
+        db_session.add(
+            Account(
+                player=Player(first_name="Marco", last_name="Rossi"),
+                email="marco@example.com",
+                password_hash=Argon2PasswordHasher().hash(PASSWORD),
+                role=Role.PLAYER,
+                failed_logins=0,
+            )
+        )
+        db_session.flush()
+        client.post("/auth/login", json={"email": "marco@example.com", "password": PASSWORD}, headers=WRITE_HEADER)
+
+        response = client.post("/players", json={"first_name": "Luca"}, headers=WRITE_HEADER)
+
+        assert response.status_code == 403

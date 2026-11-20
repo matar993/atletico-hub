@@ -7,8 +7,9 @@ from fastapi import Depends
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session as DbSession
 
-from atletico_hub.auth.dependencies import current_account, require_admin
+from atletico_hub.auth.dependencies import current_account, require
 from atletico_hub.auth.models import Account, Role, Session
+from atletico_hub.auth.permissions import Permission
 from atletico_hub.auth.tokens import hash_token
 from atletico_hub.players.models import Player
 
@@ -23,7 +24,7 @@ def account_endpoint(account: Annotated[Account, Depends(current_account)]) -> d
     return {"email": account.email}
 
 
-def admin_endpoint(account: Annotated[Account, Depends(require_admin)]) -> dict[str, str]:
+def admin_endpoint(account: Annotated[Account, Depends(require(Permission.SQUAD_CREATE))]) -> dict[str, str]:
     return {"email": account.email}
 
 
@@ -129,7 +130,7 @@ class TestDependencies:
         assert "samesite=lax" in cookie
 
     @pytest.mark.parametrize(("role", "status_code"), [(Role.PLAYER, 403), (Role.ADMIN, 200)])
-    def test_require_admin_answers_403_to_a_player_and_lets_an_admin_through(
+    def test_require_answers_403_to_a_player_and_lets_an_admin_through(
         self,
         client: TestClient,
         db_session: DbSession,
