@@ -65,6 +65,7 @@ The command refuses an email already in use and a password outside 8 to 128 char
 - To start from an empty database, run `docker compose down -v`: it also deletes the volumes.
 - `example.env` lists the variables you can set.
 - `AUTH_COOKIE_SECURE` sets the `Secure` flag of the session cookie. It defaults to `true`. `compose.yaml` sets it to `false`, because the local stack runs on plain HTTP and Safari drops `Secure` cookies there. Keep it `true` on any deploy behind HTTPS.
+- `API_DOCS_ENABLED` turns on `/docs`, `/redoc` and `/openapi.json`. It defaults to `false`, so a deployed API shows no documentation page. `compose.yaml` sets it to `true`, because `make ui-gen-api` reads `/openapi.json` from the local stack. Keep it `false` on any deploy.
 - When the web app does not reload on file changes, set `VITE_POLLING=1` in `.env`.
 
 ## Technology stack
