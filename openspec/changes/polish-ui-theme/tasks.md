@@ -7,7 +7,7 @@
 
 ## 2. Theme
 
-- [ ] 2.1 Add `public/theme-init.js` and load it in the `<head>` of `index.html` before the CSS; verify the built `dist/index.html` references it and `.dark` is set before first paint in `npm run dev`
+- [x] 2.1 Add `public/theme-init.js` and load it in the `<head>` of `index.html` before the CSS; verify the built `dist/index.html` references it and `.dark` is set before first paint in `npm run dev`
 - [ ] 2.2 Add `src/theme/` (`ThemeProvider`, `useTheme`) with unit tests: default system, saved choice, system change event, storage that throws; verify `make ui-test` passes
 - [ ] 2.3 Add `ThemeMenu` (Radix DropdownMenu, radio items Chiaro, Scuro, Sistema, accessible name "Tema") with unit tests selecting each choice and checking `.dark` on `<html>`; verify `make ui-test` passes
 
