@@ -29,7 +29,16 @@ Backend (`backend/src/atletico_hub/`):
 
 - Use Pydantic models and type hints. See the [`pydantic`](.agents/skills/pydantic/SKILL.md) skill for models with constraints or hierarchies.
 - Build the API with FastAPI as the [`fastapi`](.agents/skills/fastapi/SKILL.md) skill describes: dependencies, response models, streaming responses.
-- Reach the database through a repository, so storage can be mocked in unit tests (principle 7, depend on abstractions). A repository wraps the SQLAlchemy `Session` that routes get from `get_session` (`atletico_hub/db/session.py`).
+- Split each feature into layers ([ADR-0006](docs/documents/architecture/adr/0006-layered-feature-packages-in-the-api.md)). A layer imports only the layers below it; `make lint-imports` checks it:
+  - `router.py`: HTTP only. Parse input, call the service, return a schema, turn domain exceptions into HTTP errors. No business rule, no query.
+  - `service.py`: business rules, one public method per use case. Never import FastAPI or raise `HTTPException`: raise a domain exception declared in the same module.
+  - `schemas.py`: Pydantic request and response models. Never return an ORM model from a route.
+  - `repository.py`: queries through the SQLAlchemy `Session` that `get_session` gives (`atletico_hub/db/session.py`). No business rule, no commit.
+  - `models.py`: SQLAlchemy models, the entities. No separate domain model and no mapper.
+- The service depends on `Protocol`s declared in `service.py`, never on a concrete repository (principle 7, depend on abstractions). The repository satisfies the `Protocol` structurally, so it imports nothing from the service.
+- The service owns the transaction: it calls `commit()` once its use case is complete. `get_session` only closes the session. Repositories never commit.
+- Wire the layers in the router with `Depends`. Construct dependencies in one place; never build them inside a service.
+- Keep functions small: one level of abstraction per function. ruff fails above complexity 8, 5 arguments, 8 branches, 4 returns or 30 statements.
 - Declare tables as SQLAlchemy models that extend `atletico_hub.db.base.Base`, in the `models.py` of their feature (`atletico_hub/<feature>/models.py`). Each model change ships with its Alembic migration ([setup guide](docs/documents/developer-guide/setup/README.md#database-migrations)).
 - Write routes that use the database as plain `def` functions: database access is synchronous ([ADR-0005](docs/documents/architecture/adr/0005-database-access-through-sqlalchemy-and-alembic.md)).
 - Use immutability for classes. No setter methods (illegal states unrepresentable).
@@ -66,6 +75,10 @@ Write many unit tests, some integration tests and few end-to-end tests. The lowe
 | End to end | `tests/system/` | Playwright | Few |
 
 - A unit test never launches the stack. It uses mocks, so it runs in milliseconds.
+- Test each backend layer at its own level:
+  - service: unit tests, with in-memory fakes of its `Protocol`s. Prefer a fake to a `Mock`: it survives refactors. Most tests live here.
+  - repository: integration tests on real Postgres, with the `db_session` fixture.
+  - router: system tests through `TestClient`. One per route and outcome: status code, response shape, error mapping, data stored.
 - Test business rules at the unit level. Use the higher levels only for what a unit test cannot show: real SQL, the wiring of the whole app, a flow in the browser.
 - A bug fix starts with a test that fails for the bug, at the lowest level that can show it.
 
