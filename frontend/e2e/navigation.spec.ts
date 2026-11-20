@@ -1,4 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
+import { signIn } from './support/session'
+
+test.beforeEach(({ page }) => signIn(page))
 
 const SECTIONS = [
   { label: 'Home', path: '/' },
