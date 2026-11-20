@@ -45,4 +45,4 @@ flowchart LR
 
 ## Today
 
-The app holds only the skeleton: the API answers `GET /health` and the web app shows the home page. The database layer is in place, with no table yet. Each feature arrives as an OpenSpec change, which updates this document when it changes the components or their boundaries.
+The app holds only the skeleton: the API answers `GET /health` and the web app shows a layout (header with the team name, navigation menu, content area) with one placeholder page per section: Home, Eventi, Convocazioni, Rosa, Notifiche, Profilo. The database layer is in place, with no table yet. Each feature arrives as an OpenSpec change, which updates this document when it changes the components or their boundaries.
