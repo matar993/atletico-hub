@@ -23,8 +23,8 @@ def client(db_session: Session) -> Iterator[TestClient]:
 def mount_route() -> Iterator[Callable[..., None]]:
     mounted: list[str] = []
 
-    def mount(path: str, endpoint: Callable[..., Any], methods: list[str]) -> None:
-        app.add_api_route(path, endpoint, methods=methods)
+    def mount(path: str, endpoint: Callable[..., Any], methods: list[str], **options: Any) -> None:
+        app.add_api_route(path, endpoint, methods=methods, **options)
         mounted.append(path)
 
     yield mount
