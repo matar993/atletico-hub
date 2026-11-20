@@ -42,7 +42,7 @@ def change_role(account_id: int, body: ChangeRoleRequest, service: ServiceDep) -
     try:
         account = service.change_role(account_id, body.role)
     except AccountNotFoundError as ex:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(ex)) from ex
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Account non trovato") from ex
     except LastAdminError as ex:
         raise HTTPException(status.HTTP_409_CONFLICT, detail="Serve almeno un admin") from ex
     return AccountRole(id=account.id, role=account.role)

@@ -104,8 +104,8 @@ class TestMain:
 
         assert capsys.readouterr().out == "Admin created: anna@example.com\n"
 
-    def test_promote_makes_the_player_an_admin(
-        self, on_test_session: Callable[[str, str], None], db_session: DbSession
+    def test_promote_makes_the_player_an_admin_and_names_them(
+        self, on_test_session: Callable[[str, str], None], db_session: DbSession, capsys: pytest.CaptureFixture[str]
     ) -> None:
         luca = add_player_account(db_session)
         on_test_session("luca@example.com", "")
@@ -113,6 +113,7 @@ class TestMain:
         assert main(["promote"]) == 0
 
         assert luca.role == Role.ADMIN
+        assert capsys.readouterr().out == "Admin: Luca Bianchi (luca@example.com)\n"
 
     def test_promote_fails_on_an_unknown_email_and_says_why(
         self, on_test_session: Callable[[str, str], None], capsys: pytest.CaptureFixture[str]

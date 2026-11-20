@@ -116,7 +116,10 @@ class TestChangeRole:
     def test_an_unknown_account_answers_404(self, client: TestClient, db_session: DbSession) -> None:
         sign_in(client, add_account(db_session, "Anna", "Rossi", Role.ADMIN))
 
-        assert put_role(client, 0, "admin") == 404
+        response = client.put("/users/0/role", json={"role": "admin"}, headers=WRITE_HEADER)
+
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Account non trovato"
 
     def test_a_player_cannot_change_a_role_even_with_an_invalid_body_and_nothing_changes(
         self, client: TestClient, db_session: DbSession

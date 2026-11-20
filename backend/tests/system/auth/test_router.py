@@ -235,6 +235,7 @@ class TestAuthRouter:
         response = client.post("/auth/invites", json={"player_id": 0}, headers=WRITE_HEADER)
 
         assert response.status_code == 404
+        assert response.json()["detail"] == "Giocatore non trovato"
 
     @pytest.mark.parametrize(
         ("target_role", "own_account", "expected"),

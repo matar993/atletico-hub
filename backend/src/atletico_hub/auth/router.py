@@ -70,7 +70,7 @@ def create_invite(body: CreateInviteRequest, service: ServiceDep) -> InviteCreat
     try:
         token, invite = service.create_invite(player_id=body.player_id)
     except PlayerNotFoundError as ex:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Player not found") from ex
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Giocatore non trovato") from ex
     except AdminAccountError as ex:
         raise HTTPException(
             status.HTTP_409_CONFLICT, detail="La password di un admin si reimposta solo da riga di comando"

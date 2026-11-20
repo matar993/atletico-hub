@@ -62,7 +62,8 @@ def _run_create_admin(session: Session) -> str:
 
 
 def _run_promote(session: Session) -> str:
-    return f"Admin: {promote(session, input('Email: ')).email}"
+    account = promote(session, input("Email: "))
+    return f"Admin: {account.player.first_name} {account.player.last_name} ({account.email})"
 
 
 def _run_reset_password(session: Session) -> str:
