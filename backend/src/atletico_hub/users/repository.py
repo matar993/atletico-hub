@@ -28,7 +28,10 @@ class UserRepository:
         )
 
     def lock_admins(self) -> Sequence[int]:
-        return self._session.scalars(select(Account.id).where(Account.role == Role.ADMIN).with_for_update()).all()
+        # Lock in id order: two demotions at once then take the locks in the same order and cannot deadlock.
+        return self._session.scalars(
+            select(Account.id).where(Account.role == Role.ADMIN).order_by(Account.id).with_for_update()
+        ).all()
 
     def delete_open_invites_of_player(self, player_id: int) -> None:
         self._session.execute(delete(Invite).where(Invite.player_id == player_id, Invite.used_at.is_(None)))
