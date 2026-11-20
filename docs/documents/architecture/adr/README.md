@@ -11,4 +11,4 @@ Decisions that span the whole project, one file per decision. Decisions that bel
 | [0005](0005-database-access-through-sqlalchemy-and-alembic.md) | The API reaches Postgres through synchronous SQLAlchemy 2, with Alembic migrations | accepted | 2026-11-16 |
 | [0006](0006-layered-feature-packages-in-the-api.md) | Each API feature is a package of layers: router, service, schemas, repository, models | accepted | 2026-11-20 |
 | [0007](0007-email-and-password-login-with-personal-invite-links.md) | Users sign in with email and password; accounts come only from personal invite links; sessions live in Postgres | accepted | 2026-11-20 |
-| [0008](0008-permissions-in-code-checked-on-every-route.md) | Routes check permissions mapped from roles in code; answers carry the actions the user may take on each resource | proposed | 2026-11-20 |
+| [0008](0008-permissions-in-code-checked-on-every-route.md) | Routes check permissions mapped from roles in code; answers carry the actions the user may take on each resource | accepted | 2026-11-20 |

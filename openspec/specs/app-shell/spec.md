@@ -6,15 +6,19 @@ Gives the web app its frame: a header, a navigation menu that works on a phone a
 ## Requirements
 
 ### Requirement: Sections of the app
-The web app SHALL offer these sections, each at its own path, in this menu order: Home (`/`), Eventi (`/events`), Convocazioni (`/call-ups`), Rosa (`/squad`), Notifiche (`/notifications`), Profilo (`/profile`). Every section label SHALL be in Italian.
+The web app SHALL offer these sections, each at its own path, in this menu order: Home (`/`), Eventi (`/events`), Convocazioni (`/call-ups`), Rosa (`/squad`), Notifiche (`/notifications`), Profilo (`/profile`), Utenti (`/users`). The menu SHALL show Utenti only to a user with the role `admin`. Every section label SHALL be in Italian.
 
 #### Scenario: Open a section by its path
 - **WHEN** the user opens `/squad` directly in the browser
 - **THEN** the app shows the layout with the Rosa page in the content area
 
 #### Scenario: Menu lists every section
-- **WHEN** the user opens the menu
-- **THEN** the menu shows the six sections in the order above, each with an icon and its label
+- **WHEN** an admin opens the menu
+- **THEN** the menu shows the seven sections in the order above, each with an icon and its label
+
+#### Scenario: Menu of a player
+- **WHEN** a user with the role `player` opens the menu
+- **THEN** the menu shows the first six sections and no Utenti entry
 
 ### Requirement: Layout of every page
 Every page SHALL render inside one layout: a header at the top that shows the team name, the navigation menu, and a content area that shows the current section.
@@ -60,7 +64,7 @@ On a narrow screen the menu SHALL be hidden and SHALL open as a drawer from a ha
 - **THEN** the menu is not visible and the header shows the hamburger button
 
 ### Requirement: Placeholder pages
-Each section except Rosa SHALL show a page with a title equal to its label, one line that says what the section will be for, and an empty state. The pages SHALL show no real data and SHALL make no API call.
+Each section except Rosa, Profilo and Utenti SHALL show a page with a title equal to its label, one line that says what the section will be for, and an empty state. The pages SHALL show no real data and SHALL make no API call.
 
 #### Scenario: Placeholder content
 - **WHEN** the user opens Convocazioni
@@ -90,3 +94,10 @@ The header SHALL show the first name and last name of the signed-in user and a l
 #### Scenario: Log out
 - **WHEN** a signed-in user taps the logout button
 - **THEN** the app shows the login page, and opening any section again shows the login page
+
+### Requirement: Not authorized page
+A user who opens a section they may not use SHALL see, inside the layout, a page that says "Non hai i permessi per vedere questa pagina", with a link to Home. The page SHALL make no call to the API of that section.
+
+#### Scenario: Player opens Utenti by its path
+- **WHEN** a user with the role `player` opens `/users` directly in the browser
+- **THEN** the app shows the layout with the not authorized page and a link to Home

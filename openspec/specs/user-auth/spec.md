@@ -87,7 +87,7 @@ The API SHALL answer a request for the current user with the name of their playe
 - **THEN** the API answers 401
 
 ### Requirement: API closed without a session
-Every API route SHALL answer 401 to a request without a valid session, except the health check, login, and the invite routes.
+Every API route SHALL answer 401 to a request without a valid session, except the health check, login, the invite routes, and the API documentation pages when they are on.
 
 #### Scenario: Route closed to anonymous requests
 - **WHEN** a request without a session asks for the list of players
@@ -108,13 +108,6 @@ Every request with the method POST, PUT, PATCH or DELETE SHALL carry the header 
 - **WHEN** a signed-in user sends a GET request without the header
 - **THEN** the API answers normally
 
-### Requirement: Admin-only actions
-The API SHALL answer 403 when a user with the role `player` calls a route reserved for admins.
-
-#### Scenario: Player calls an admin route
-- **WHEN** a user with the role `player` asks to add a player to the squad
-- **THEN** the API answers 403 and changes nothing
-
 ### Requirement: First admin
 A command run on the API host SHALL create the first admin: a player with a first name and a last name, and an admin account with an email and a password. The command SHALL ask for the password without echoing it. The command SHALL refuse an email already in use.
 
@@ -125,3 +118,14 @@ A command run on the API host SHALL create the first admin: a player with a firs
 #### Scenario: Email already in use
 - **WHEN** an operator runs the command with an email that already has an account
 - **THEN** the command fails with a message and creates nothing
+
+### Requirement: API documentation off by default
+The API SHALL serve its documentation pages and its OpenAPI schema (`/docs`, `/redoc`, `/openapi.json`) only when a setting turns them on. The setting SHALL be off when it is not set, and on in the local stack.
+
+#### Scenario: Setting not set
+- **WHEN** the API runs without the setting and a request asks for `/openapi.json`
+- **THEN** the API answers 404
+
+#### Scenario: Local stack
+- **WHEN** the API runs in the local stack and a request asks for `/openapi.json`
+- **THEN** the API answers the OpenAPI schema
